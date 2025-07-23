@@ -3,7 +3,6 @@ name: M+ Requirement Check (Previous Period)
 on:
   schedule:
     # Example: Runs every Sunday at 18:00 UTC (20:00 Danish time)
-    # Adjust cron schedule as needed
     - cron: '0 18 * * 0' # Sunday 20:00 Danish Time
   workflow_dispatch:
     # Allows you to manually trigger this specific workflow from the GitHub UI
@@ -28,4 +27,5 @@ jobs:
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USE_PREVIOUS_PERIOD: 'true' # Tell the Python script to use current_period - 1
+          USE_PREVIOUS_PERIOD: 'true'  # Tell the Python script to use current_period - 1
+          PERIOD_TYPE: 'previous'      # Tell the Python script this is the previous period check

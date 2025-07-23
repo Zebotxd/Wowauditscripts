@@ -19,7 +19,7 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # Set this to a specific period ID (e.g., 1020) for testing with historical data.
 # Set to None to automatically fetch the current period and then subtract 1.
-TEST_PERIOD = 1020 # Change to None for live previous period, e.g., TEST_PERIOD = None
+TEST_PERIOD = None # Change to None for live previous period, e.g., TEST_PERIOD = None
 
 # --- Function to Send Message to Discord Webhook ---
 def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003):

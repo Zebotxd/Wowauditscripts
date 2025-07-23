@@ -53,6 +53,12 @@ CLASS_IMAGE_MAP = {
     "Unknown": {"url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback for unknown classes
 }
 
+# --- Generic Thumbnail URLs for Report Status ---
+THUMBNAIL_STATUS_ICONS = {
+    "incomplete": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_key_02.jpg", # Mythic Keystone icon
+    "complete": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_01.jpg" # Coin/reward icon
+}
+
 
 # --- Function to Send Message to Discord Webhook ---
 def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003, thumbnail_url=None):
@@ -370,13 +376,12 @@ def main():
             print(f"DEBUG: DISCORD_ID_MAP content before embed creation: {DISCORD_ID_MAP}")
             # --- END DEBUGGING ---
 
-            # Determine the main thumbnail for the embed based on the first player or a default
-            embed_thumbnail_url = CLASS_IMAGE_MAP.get('Unknown')['url'] # Default thumbnail
+            # Determine the main thumbnail for the embed based on the report's status
+            embed_thumbnail_url = None
             if players_to_report:
-                first_player_name = players_to_report[0]['PlayerName']
-                first_player_data_from_map = DISCORD_ID_MAP.get(first_player_name, {})
-                first_player_class = first_player_data_from_map.get('class', 'Unknown')
-                embed_thumbnail_url = CLASS_IMAGE_MAP.get(first_player_class, CLASS_IMAGE_MAP['Unknown'])['url']
+                embed_thumbnail_url = THUMBNAIL_STATUS_ICONS['incomplete'] # Use incomplete icon if players are missing
+            else:
+                embed_thumbnail_url = THUMBNAIL_STATUS_ICONS['complete'] # Use complete icon if all clear
 
 
             if players_to_report:
@@ -405,8 +410,7 @@ def main():
                 else: # Default to 'current'
                     embed_description = "Alle spillere har klaret deres m+ requirement inden reset. Godt arbejde!"
                 embed_color = 3066993 # Green color (decimal) for complete
-                # If all clear, maybe use a specific "all clear" icon or a guild logo as thumbnail
-                embed_thumbnail_url = "https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_01.jpg" # Example: a coin/reward icon
+                # Thumbnail is already set to 'complete' icon above
 
 
             send_discord_webhook(embed_description, DISCORD_WEBHOOK_URL, embed_title, embed_color, thumbnail_url=embed_thumbnail_url)

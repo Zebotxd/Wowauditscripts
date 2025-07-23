@@ -1,25 +1,29 @@
 import requests
 import json
 from datetime import datetime
-import os
+import os # Import the os module to access environment variables
 
 # --- Configuration ---
 # Your WoW Audit API Authorization header
-
+# IMPORTANT: This is now retrieved from a GitHub Secret named WOWAUDIT_API_KEY.
+# Do NOT hardcode your API key here if this script is in a public repository.
 API_AUTHORIZATION_HEADER = os.getenv('WOWAUDIT_API_KEY')
 
 # Required value for dungeon option_1 and option_2
 REQUIRED_DUNGEON_OPTION_VALUE = 662
 
 # Discord Webhook URL
-# IMPORTANT: In a real GitHub Action, you should store this in a GitHub Secret.
-# For example: DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-
+# IMPORTANT: This is now retrieved from a GitHub Secret named DISCORD_WEBHOOK_URL.
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # Set this to a specific period ID (e.g., 1020) for testing with historical data.
-# Set to None to automatically fetch the current period and then subtract 1.
-TEST_PERIOD = None # Change to None for live previous period, e.g., TEST_PERIOD = None
+# Set to None to automatically determine the period based on USE_PREVIOUS_PERIOD_ENV.
+TEST_PERIOD = None # Change to a specific number (e.g., 1020) for testing, or None for dynamic period
+
+# --- Environment Variable Check for Period Logic ---
+# If 'true', the script will use (current_period - 1). Otherwise, it uses current_period.
+# This variable is set in the GitHub Actions workflow.
+USE_PREVIOUS_PERIOD_ENV = os.getenv('USE_PREVIOUS_PERIOD', 'false').lower() == 'true'
 
 # --- Function to Send Message to Discord Webhook ---
 def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003):
@@ -73,6 +77,16 @@ def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Updat
 
 # --- Main Script Logic ---
 def main():
+    # Check if API_AUTHORIZATION_HEADER is set (from environment variable)
+    if not API_AUTHORIZATION_HEADER:
+        print("Error: WOWAUDIT_API_KEY environment variable is not set. Please configure it as a GitHub Secret.")
+        exit(1) # Exit if API key is missing
+
+    # Check if Discord Webhook URL is set
+    if not DISCORD_WEBHOOK_URL:
+        print("Error: DISCORD_WEBHOOK_URL environment variable is not set. Please configure it as a GitHub Secret.")
+        exit(1) # Exit if webhook URL is missing
+
     period_to_use = None
 
     # Step 1: Determine the period to use
@@ -97,9 +111,12 @@ def main():
             if current_period_from_api is None:
                 raise ValueError(f"Could not find 'current_period' in the response from {period_api_url}. Response: {json.dumps(period_data)}")
 
-            # Calculate the previous period
-            period_to_use = current_period_from_api - 1
-            print(f"Current period retrieved: {current_period_from_api}. Using previous period for data: {period_to_use}")
+            if USE_PREVIOUS_PERIOD_ENV:
+                period_to_use = current_period_from_api - 1
+                print(f"Current period retrieved: {current_period_from_api}. Using PREVIOUS period for data: {period_to_use}")
+            else:
+                period_to_use = current_period_from_api
+                print(f"Current period retrieved: {current_period_from_api}. Using CURRENT period for data: {period_to_use}")
 
         except requests.exceptions.RequestException as e:
             print(f"Error: An error occurred while fetching the current period: {e}")
@@ -146,19 +163,22 @@ def main():
             report_player = True
             status_details = None
 
-            if dungeon_vault_option:
-                option1 = dungeon_vault_option.get("option_1")
-                option2 = dungeon_vault_option.get("option_2")
-
-                if option1 == REQUIRED_DUNGEON_OPTION_VALUE and option2 == REQUIRED_DUNGEON_OPTION_VALUE:
-                    report_player = False
-                else:
-                    status_details = {
-                        "Option1": option1,
-                        "Option2": option2
-                    }
+            # Determine if the player needs to be reported and their status
+            if dungeon_vault_option and \
+               dungeon_vault_option.get("option_1") == REQUIRED_DUNGEON_OPTION_VALUE and \
+               dungeon_vault_option.get("option_2") == REQUIRED_DUNGEON_OPTION_VALUE:
+                # Player met the full requirement, do not report
+                report_player = False
             else:
-                status_details = "No 'dungeons' vault option found."
+                # Player did NOT meet the full requirement, report them
+                report_player = True
+
+                if dungeon_vault_option and dungeon_vault_option.get("option_1") == REQUIRED_DUNGEON_OPTION_VALUE:
+                    # Option 1 is met, but option 2 is not (or is None)
+                    status_details = "Mangler 1 vault slot"
+                else:
+                    # Neither option 1 nor option 2 is met (or dungeons object missing/options are None)
+                    status_details = "Mangler 2 vault slots"
 
             if report_player:
                 players_to_report.append({
@@ -172,7 +192,7 @@ def main():
         if players_to_report:
             for player in players_to_report:
                 print(f"Player: {player['PlayerName']}")
-                if isinstance(player['DungeonVaultStatus'], dict):
+                if isinstance(player['DungeonVaultStatus'], dict): # This branch is now less likely with new status_details
                     print(f"  Dungeons Options: Option 1: {player['DungeonVaultStatus']['Option1']}, Option 2: {player['DungeonVaultStatus']['Option2']}")
                 else:
                     print(f"  Status: {player['DungeonVaultStatus']}")
@@ -181,12 +201,12 @@ def main():
             print(f"All players in the data have at least one 'dungeons' vault option with both option_1 and option_2 set to {REQUIRED_DUNGEON_OPTION_VALUE}, or no data was processed.")
 
         # Step 4: Prepare and Send Discord Webhook Message (as an Embed)
-        if DISCORD_WEBHOOK_URL != 'YOUR_DISCORD_WEBHOOK_URL_HERE' and DISCORD_WEBHOOK_URL:
+        if DISCORD_WEBHOOK_URL: # Check if it's not empty/None
             embed_description = "Følgende spillere mangler forsat at klare deres m+ requirement inden reset:\n\n"
 
             if players_to_report:
                 for player in players_to_report:
-                    embed_description += f"{player['PlayerName']}\n"
+                    embed_description += f"{player['PlayerName']} - {player['DungeonVaultStatus']}\n"
                 embed_title = "M+ Requirement: Manglende Spillere"
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:

@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs every Monday at 08:00 UTC (10:00 Danish time)
     #- cron: '0 8 * * 1' # Monday 10:00 Dansk Tid
-    - cron: '*/5 * * * *'
+    #- cron: '*/5 * * * *'
   #workflow_dispatch:
     # Allows you to manually trigger this specific workflow from the GitHub UI
 
@@ -30,6 +30,6 @@ jobs:
         run: python check_mplus_requirements.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_CURRENT_PERIOD }}
           USE_PREVIOUS_PERIOD: 'false'
           PERIOD_TYPE: 'current'

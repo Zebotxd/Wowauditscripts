@@ -33,6 +33,28 @@ USE_PREVIOUS_PERIOD_ENV = os.getenv('USE_PREVIOUS_PERIOD', 'false').lower() == '
 # Set in GitHub Actions workflow to 'current' or 'previous'.
 PERIOD_TYPE = os.getenv('PERIOD_TYPE', 'current').lower() # Default to 'current'
 
+# --- Class Image Mapping ---
+# Map WoW class names to Discord-compatible image URLs.
+# You can replace these with actual class icons hosted elsewhere.
+CLASS_IMAGE_MAP = {
+    "Death Knight": "https://placehold.co/20x20/000000/ffffff?text=DK",
+    "Demon Hunter": "https://placehold.co/20x20/8C032F/ffffff?text=DH",
+    "Druid": "https://placehold.co/20x20/FF7C0A/ffffff?text=DRU",
+    "Evoker": "https://placehold.co/20x20/33937F/ffffff?text=EVO",
+    "Hunter": "https://placehold.co/20x20/AAD372/ffffff?text=HUN",
+    "Mage": "https://placehold.co/20x20/3FC7EB/ffffff?text=MAG",
+    "Monk": "https://placehold.co/20x20/00FF98/ffffff?text=MON",
+    "Paladin": "https://placehold.co/20x20/F48CBA/ffffff?text=PAL",
+    "Priest": "https://placehold.co/20x20/FFFFFF/000000?text=PRI",
+    "Rogue": "https://placehold.co/20x20/FFF468/000000?text=ROG",
+    "Shaman": "https://placehold.co/20x20/0070DD/ffffff?text=SHA",
+    "Warlock": "https://placehold.co/20x20/8788EE/ffffff?text=WARL",
+    "Warrior": "https://placehold.co/20x20/C69B6D/ffffff?text=WARR",
+    # Add other classes as needed
+    "Unknown": "https://placehold.co/20x20/808080/ffffff?text=?" # Fallback for unknown classes
+}
+
+
 # --- Function to Send Message to Discord Webhook ---
 def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003):
     """
@@ -85,8 +107,9 @@ def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Updat
 # --- Function to Update Discord ID Mapping File ---
 def update_discord_id_map_file(api_auth_header, map_file_path):
     """
-    Fetches character names from WoW Audit API and updates the Discord ID map file.
-    New characters are added with a null Discord ID.
+    Fetches character names and classes from WoW Audit API and updates the Discord ID map file.
+    New characters are added with a null Discord ID and their class.
+    Existing entries are updated with class info if missing or different, and converted to new format if old.
     """
     print(f"Attempting to update Discord ID map file: {map_file_path}")
     characters_api_url = 'https://wowaudit.com/v1/characters'
@@ -115,24 +138,52 @@ def update_discord_id_map_file(api_auth_header, map_file_path):
             print(f"'{map_file_path}' not found. A new map will be created.")
 
         updated_map = existing_map.copy()
-        new_names_added = 0
+        changes_made = False
 
-        # Iterate through characters from API and add new ones to the map
+        # Iterate through characters from API and update the map
         for char_data in api_characters_data:
             char_name = char_data.get('name')
-            if char_name and char_name not in updated_map:
-                updated_map[char_name] = None # Add new character with null Discord ID
-                new_names_added += 1
+            char_class = char_data.get('class') # Get the class from the API response
 
-        if new_names_added > 0:
+            if not char_name:
+                continue # Skip if no name
+
+            if char_name not in updated_map:
+                # New character: add with null discord_id and fetched class
+                updated_map[char_name] = {"discord_id": None, "class": char_class}
+                print(f"Added new character '{char_name}' (Class: {char_class}) to map.")
+                changes_made = True
+            else:
+                # Existing character: check format and update class if needed
+                current_entry = updated_map[char_name]
+                if isinstance(current_entry, str):
+                    # Old format (just Discord ID string), convert to new dict format
+                    updated_map[char_name] = {"discord_id": current_entry, "class": char_class}
+                    print(f"Converted '{char_name}' to new map format, added Class: {char_class}.")
+                    changes_made = True
+                elif isinstance(current_entry, dict):
+                    # New format, check if class needs update
+                    if current_entry.get("class") != char_class:
+                        updated_map[char_name]["class"] = char_class
+                        print(f"Updated class for '{char_name}' to: {char_class}.")
+                        changes_made = True
+                    # If discord_id is missing but class is present, ensure discord_id is None
+                    if "discord_id" not in current_entry:
+                        updated_map[char_name]["discord_id"] = None
+                        changes_made = True
+                else:
+                    print(f"Warning: Unexpected format for '{char_name}' in map. Skipping class update.")
+
+
+        if changes_made:
             # Write the updated map back to the file
             with open(map_file_path, 'w', encoding='utf-8') as f:
                 json.dump(updated_map, f, indent=2, ensure_ascii=False)
-            print(f"Successfully added {new_names_added} new character(s) to '{map_file_path}'.")
-            print("Remember to manually update the Discord IDs for new entries in this file.")
+            print(f"Discord ID map '{map_file_path}' updated successfully.")
+            print("Remember to manually update the 'discord_id' for new/updated entries in this file.")
             return True # Indicate that the map was updated
         else:
-            print("No new characters found to add to the Discord ID map.")
+            print("No changes needed for the Discord ID map.")
             return False # Indicate no update was needed
 
     except requests.exceptions.RequestException as e:
@@ -165,9 +216,7 @@ def main():
         
         try:
             with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
-                # No 'global' keyword needed here as it's declared at function start
                 DISCORD_ID_MAP = json.load(f)
-            # print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE}") # Already printed in update function
         except FileNotFoundError:
             print(f"Warning: Discord ID map file '{DISCORD_ID_MAP_FILE}' not found after update attempt. Players will not be tagged.")
         except json.JSONDecodeError:
@@ -178,7 +227,6 @@ def main():
         # For previous period, just try to load the map without updating it
         try:
             with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
-                # No 'global' keyword needed here as it's declared at function start
                 DISCORD_ID_MAP = json.load(f)
             print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE} for non-current period.")
         except FileNotFoundError:
@@ -323,13 +371,19 @@ def main():
                     player_name = player['PlayerName']
                     status = player['DungeonVaultStatus']
                     
+                    # Get class and image URL
+                    player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
+                    player_class = player_data_from_map.get('class', 'Unknown')
+                    class_image_url = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])
+                    
                     # Attempt to get Discord ID for tagging, only for 'current' period
-                    # Ensure DISCORD_ID_MAP[player_name] is not None (i.e., it has a valid ID)
-                    if PERIOD_TYPE == 'current' and player_name in DISCORD_ID_MAP and DISCORD_ID_MAP[player_name] is not None:
-                        discord_id = DISCORD_ID_MAP[player_name]
-                        embed_description += f"<@{discord_id}> - {status}\n"
+                    discord_id = player_data_from_map.get('discord_id')
+
+                    # Format the player line with image, name, and status
+                    if PERIOD_TYPE == 'current' and discord_id is not None:
+                        embed_description += f"![{player_class}]({class_image_url}) <@{discord_id}> - {status}\n"
                     else:
-                        embed_description += f"{player_name} - {status}\n"
+                        embed_description += f"![{player_class}]({class_image_url}) {player_name} - {status}\n"
                         
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:

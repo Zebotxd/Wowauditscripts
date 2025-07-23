@@ -44,7 +44,7 @@ CLASS_IMAGE_MAP = {
     "Hunter": "https://placehold.co/20x20/AAD372/ffffff?text=HUN",
     "Mage": "https://placehold.co/20x20/3FC7EB/ffffff?text=MAG",
     "Monk": "https://placehold.co/20x20/00FF98/ffffff?text=MON",
-    "Paladin": "https://placehold.co/20x20/F48CBA/ffffff?text=PAL",
+    "Paladin": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg",
     "Priest": "https://placehold.co/20x20/FFFFFF/000000?text=PRI",
     "Rogue": "https://placehold.co/20x20/FFF468/000000?text=ROG",
     "Shaman": "https://placehold.co/20x20/0070DD/ffffff?text=SHA",

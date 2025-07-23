@@ -1,11 +1,12 @@
 import requests
 import json
 from datetime import datetime
+import os
 
 # --- Configuration ---
 # Your WoW Audit API Authorization header
-import os
-API_AUTHORIZATION_HEADER = os.getenv('APIKEY')
+
+API_AUTHORIZATION_HEADER = os.getenv('WOWAUDIT_API_KEY')
 
 # Required value for dungeon option_1 and option_2
 REQUIRED_DUNGEON_OPTION_VALUE = 662
@@ -13,7 +14,7 @@ REQUIRED_DUNGEON_OPTION_VALUE = 662
 # Discord Webhook URL
 # IMPORTANT: In a real GitHub Action, you should store this in a GitHub Secret.
 # For example: DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-import os
+
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # Set this to a specific period ID (e.g., 1020) for testing with historical data.

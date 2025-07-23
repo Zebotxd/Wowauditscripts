@@ -33,5 +33,5 @@ jobs:
            #Then, in your Python script, you'd retrieve it using os.getenv('DISCORD_WEBHOOK_URL')
            #For this example, it's directly in the Python script, but secrets are best practice.
            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-           API_AUTHORIZATION_HEADER: ${{ secrets.APIKEY }}
+           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
            

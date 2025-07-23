@@ -5,7 +5,7 @@ on:
     # Runs every Monday at 08:00 UTC (10:00 Danish time)
     #- cron: '0 8 * * 1' # Monday 10:00 Danish Time
     - cron: '*/5 * * * *'
-  workflow_dispatch:
+  #workflow_dispatch:
     # Allows you to manually trigger this specific workflow from the GitHub UI
 
 jobs:

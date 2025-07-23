@@ -33,24 +33,28 @@ USE_PREVIOUS_PERIOD_ENV = os.getenv('USE_PREVIOUS_PERIOD', 'false').lower() == '
 # Set in GitHub Actions workflow to 'current' or 'previous'.
 PERIOD_TYPE = os.getenv('PERIOD_TYPE', 'current').lower() # Default to 'current'
 
-# --- Class Image Mapping (includes URL for thumbnail and abbreviation for description) ---
-# Map WoW class names to a dictionary containing a URL for the icon and an abbreviation.
-# The URLs are from wow.zamimg.com, which is a common source for WoW icons.
+# --- Class Emoji/Image Mapping ---
+# Map WoW class names to a dictionary containing:
+# 'emoji': The custom Discord emoji string (e.g., "<:paladin:123456789012345678>")
+# 'url': A URL for a class icon (can be used for embed thumbnail if desired)
+# 'abbr': A text abbreviation (fallback if emojis aren't used or don't render)
+#
+# IMPORTANT: Replace the placeholder emoji IDs with your actual Discord custom emoji IDs!
 CLASS_IMAGE_MAP = {
-    "Death Knight": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_deathknight.jpg", "abbr": "DK"},
-    "Demon Hunter": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_demonhunter.jpg", "abbr": "DH"},
-    "Druid": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_druid.jpg", "abbr": "DRU"},
-    "Evoker": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_evoker.jpg", "abbr": "EVO"},
-    "Hunter": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_hunter.jpg", "abbr": "HUN"},
-    "Mage": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_mage.jpg", "abbr": "MAG"},
-    "Monk": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_monk.jpg", "abbr": "MON"},
-    "Paladin": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg", "abbr": "PAL"},
-    "Priest": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_priest.jpg", "abbr": "PRI"},
-    "Rogue": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg", "abbr": "ROG"},
-    "Shaman": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
-    "Warlock": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warlock.jpg", "abbr": "WARL"},
-    "Warrior": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warrior.jpg", "abbr": "WARR"},
-    "Unknown": {"url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback for unknown classes
+    "Death Knight": {"emoji": "<:dk:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_deathknight.jpg", "abbr": "DK"},
+    "Demon Hunter": {"emoji": "<:dh:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_demonhunter.jpg", "abbr": "DH"},
+    "Druid": {"emoji": "<:druid:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_druid.jpg", "abbr": "DRU"},
+    "Evoker": {"emoji": "<:evoker:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_evoker.jpg", "abbr": "EVO"},
+    "Hunter": {"emoji": "<:hunter:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_hunter.jpg", "abbr": "HUN"},
+    "Mage": {"emoji": "<:mage:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_mage.jpg", "abbr": "MAG"},
+    "Monk": {"emoji": "<:monk:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_monk.jpg", "abbr": "MON"},
+    "Paladin": {"emoji": "<:paladin:1397595736782409841>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg", "abbr": "PAL"}, # Updated Paladin emoji ID
+    "Priest": {"emoji": "<:priest:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_priest.jpg", "abbr": "PRI"},
+    "Rogue": {"emoji": "<:rogue:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg", "abbr": "ROG"},
+    "Shaman": {"emoji": "<:shaman:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
+    "Warlock": {"emoji": "<:warlock:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warlock.jpg", "abbr": "WARL"},
+    "Warrior": {"emoji": "<:warrior:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warrior.jpg", "abbr": "WARR"},
+    "Unknown": {"emoji": "", "url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback
 }
 
 # --- Generic Thumbnail URLs for Report Status ---
@@ -389,19 +393,24 @@ def main():
                     player_name = player['PlayerName']
                     status = player['DungeonVaultStatus']
                     
-                    # Get class and abbreviation
+                    # Get class info from map
                     player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                     player_class = player_data_from_map.get('class', 'Unknown')
-                    class_abbr = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
+                    
+                    # Get the custom emoji string for the class
+                    # Fallback to abbreviation if emoji is not defined or empty
+                    class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
+                    if not class_display: # If emoji string is empty, use abbreviation
+                        class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
                     
                     # Attempt to get Discord ID for tagging, only for 'current' period
                     discord_id = player_data_from_map.get('discord_id')
 
-                    # Format the player line with abbreviation, name, and status
+                    # Format the player line with custom emoji/abbreviation, name, and status
                     if PERIOD_TYPE == 'current' and discord_id is not None:
-                        embed_description += f"{class_abbr} <@{discord_id}> - {status}\n"
+                        embed_description += f"{class_display} <@{discord_id}> - {status}\n"
                     else:
-                        embed_description += f"{class_abbr} {player_name} - {status}\n"
+                        embed_description += f"{class_display} {player_name} - {status}\n"
                         
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:

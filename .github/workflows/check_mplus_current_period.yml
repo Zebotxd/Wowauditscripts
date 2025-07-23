@@ -10,9 +10,12 @@ on:
 jobs:
   check_current_period:
     runs-on: ubuntu-latest
+    # Add permissions for the workflow to write to the repository
+    permissions:
+      contents: write # This grants permission to write files to the repo
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # This action uses the GITHUB_TOKEN to check out the repo
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,7 +29,6 @@ jobs:
         run: python check_mplus_requirements.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
-          # Use the specific webhook for the current period
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_CURRENT_PERIOD }}
           USE_PREVIOUS_PERIOD: 'false'
           PERIOD_TYPE: 'current'

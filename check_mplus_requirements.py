@@ -33,29 +33,29 @@ USE_PREVIOUS_PERIOD_ENV = os.getenv('USE_PREVIOUS_PERIOD', 'false').lower() == '
 # Set in GitHub Actions workflow to 'current' or 'previous'.
 PERIOD_TYPE = os.getenv('PERIOD_TYPE', 'current').lower() # Default to 'current'
 
-# --- Class Image Mapping (now includes abbreviation for embed description) ---
-# Map WoW class names to a dictionary containing a URL (for potential future use like thumbnail)
-# and an abbreviation for direct use in the embed description.
+# --- Class Image Mapping (includes URL for thumbnail and abbreviation for description) ---
+# Map WoW class names to a dictionary containing a URL for the icon and an abbreviation.
+# The URLs are from wow.zamimg.com, which is a common source for WoW icons.
 CLASS_IMAGE_MAP = {
-    "Death Knight": {"url": "https://placehold.co/20x20/C41F3B/ffffff?text=DK", "abbr": "DK"},
-    "Demon Hunter": {"url": "https://placehold.co/20x20/A330C9/ffffff?text=DH", "abbr": "DH"},
-    "Druid": {"url": "https://placehold.co/20x20/FF7C0A/ffffff?text=DRU", "abbr": "DRU"},
-    "Evoker": {"url": "https://placehold.co/20x20/33937F/ffffff?text=EVO", "abbr": "EVO"},
-    "Hunter": {"url": "https://placehold.co/20x20/AAD372/ffffff?text=HUN", "abbr": "HUN"},
-    "Mage": {"url": "https://placehold.co/20x20/3FC7EB/ffffff?text=MAG", "abbr": "MAG"},
-    "Monk": {"url": "https://placehold.co/20x20/00FF98/ffffff?text=MON", "abbr": "MON"},
-    "Paladin": {"url": "https://placehold.co/20x20/F48CBA/ffffff?text=PAL", "abbr": "PAL"},
-    "Priest": {"url": "https://placehold.co/20x20/FFFFFF/000000?text=PRI", "abbr": "PRI"},
-    "Rogue": {"url": "https://placehold.co/20x20/FFF468/000000?text=ROG", "abbr": "ROG"},
-    "Shaman": {"url": "https://placehold.co/20x20/0070DD/ffffff?text=SHA", "abbr": "SHA"},
-    "Warlock": {"url": "https://placehold.co/20x20/8788EE/ffffff?text=WARL", "abbr": "WARL"},
-    "Warrior": {"url": "https://placehold.co/20x20/C69B6D/ffffff?text=WARR", "abbr": "WARR"},
-    "Unknown": {"url": "https://placehold.co/20x20/808080/ffffff?text=?", "abbr": "?"} # Fallback
+    "Death Knight": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_deathknight.jpg", "abbr": "DK"},
+    "Demon Hunter": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_demonhunter.jpg", "abbr": "DH"},
+    "Druid": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_druid.jpg", "abbr": "DRU"},
+    "Evoker": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_evoker.jpg", "abbr": "EVO"},
+    "Hunter": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_hunter.jpg", "abbr": "HUN"},
+    "Mage": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_mage.jpg", "abbr": "MAG"},
+    "Monk": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_monk.jpg", "abbr": "MON"},
+    "Paladin": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg", "abbr": "PAL"},
+    "Priest": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_priest.jpg", "abbr": "PRI"},
+    "Rogue": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg", "abbr": "ROG"},
+    "Shaman": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
+    "Warlock": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warlock.jpg", "abbr": "WARL"},
+    "Warrior": {"url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warrior.jpg", "abbr": "WARR"},
+    "Unknown": {"url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback for unknown classes
 }
 
 
 # --- Function to Send Message to Discord Webhook ---
-def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003):
+def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003, thumbnail_url=None):
     """
     Sends a message to a Discord webhook as an embed.
 
@@ -64,6 +64,7 @@ def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Updat
         webhook_url (str): The Discord webhook URL.
         embed_title (str): The title of the Discord embed.
         embed_color (int): The decimal color code for the embed sidebar.
+        thumbnail_url (str, optional): URL for the embed's thumbnail image.
     """
     max_message_length = 4096  # Discord embed description limit
 
@@ -82,6 +83,10 @@ def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Updat
         "color": embed_color,
         "timestamp": datetime.utcnow().isoformat() + "Z" # ISO 8601 format for Discord timestamp
     }
+
+    # Add thumbnail if provided
+    if thumbnail_url:
+        embed["thumbnail"] = {"url": thumbnail_url}
 
     # Construct the main JSON payload with the embed
     payload = {
@@ -365,16 +370,23 @@ def main():
             print(f"DEBUG: DISCORD_ID_MAP content before embed creation: {DISCORD_ID_MAP}")
             # --- END DEBUGGING ---
 
+            # Determine the main thumbnail for the embed based on the first player or a default
+            embed_thumbnail_url = CLASS_IMAGE_MAP.get('Unknown')['url'] # Default thumbnail
+            if players_to_report:
+                first_player_name = players_to_report[0]['PlayerName']
+                first_player_data_from_map = DISCORD_ID_MAP.get(first_player_name, {})
+                first_player_class = first_player_data_from_map.get('class', 'Unknown')
+                embed_thumbnail_url = CLASS_IMAGE_MAP.get(first_player_class, CLASS_IMAGE_MAP['Unknown'])['url']
+
+
             if players_to_report:
                 for player in players_to_report:
                     player_name = player['PlayerName']
                     status = player['DungeonVaultStatus']
                     
-                    # Get class and image URL
+                    # Get class and abbreviation
                     player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                     player_class = player_data_from_map.get('class', 'Unknown')
-                    
-                    # Get the abbreviation for the class
                     class_abbr = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
                     
                     # Attempt to get Discord ID for tagging, only for 'current' period
@@ -393,8 +405,11 @@ def main():
                 else: # Default to 'current'
                     embed_description = "Alle spillere har klaret deres m+ requirement inden reset. Godt arbejde!"
                 embed_color = 3066993 # Green color (decimal) for complete
+                # If all clear, maybe use a specific "all clear" icon or a guild logo as thumbnail
+                embed_thumbnail_url = "https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_01.jpg" # Example: a coin/reward icon
 
-            send_discord_webhook(embed_description, DISCORD_WEBHOOK_URL, embed_title, embed_color)
+
+            send_discord_webhook(embed_description, DISCORD_WEBHOOK_URL, embed_title, embed_color, thumbnail_url=embed_thumbnail_url)
         else:
             print("Warning: Discord webhook URL is not configured. Skipping Discord notification.")
 

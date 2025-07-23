@@ -33,25 +33,24 @@ USE_PREVIOUS_PERIOD_ENV = os.getenv('USE_PREVIOUS_PERIOD', 'false').lower() == '
 # Set in GitHub Actions workflow to 'current' or 'previous'.
 PERIOD_TYPE = os.getenv('PERIOD_TYPE', 'current').lower() # Default to 'current'
 
-# --- Class Image Mapping ---
-# Map WoW class names to Discord-compatible image URLs.
-# You can replace these with actual class icons hosted elsewhere.
+# --- Class Image Mapping (now includes abbreviation for embed description) ---
+# Map WoW class names to a dictionary containing a URL (for potential future use like thumbnail)
+# and an abbreviation for direct use in the embed description.
 CLASS_IMAGE_MAP = {
-    "Death Knight": "https://placehold.co/20x20/000000/ffffff?text=DK",
-    "Demon Hunter": "https://placehold.co/20x20/8C032F/ffffff?text=DH",
-    "Druid": "https://placehold.co/20x20/FF7C0A/ffffff?text=DRU",
-    "Evoker": "https://placehold.co/20x20/33937F/ffffff?text=EVO",
-    "Hunter": "https://placehold.co/20x20/AAD372/ffffff?text=HUN",
-    "Mage": "https://placehold.co/20x20/3FC7EB/ffffff?text=MAG",
-    "Monk": "https://placehold.co/20x20/00FF98/ffffff?text=MON",
-    "Paladin": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg",
-    "Priest": "https://placehold.co/20x20/FFFFFF/000000?text=PRI",
-    "Rogue": "https://placehold.co/20x20/FFF468/000000?text=ROG",
-    "Shaman": "https://placehold.co/20x20/0070DD/ffffff?text=SHA",
-    "Warlock": "https://placehold.co/20x20/8788EE/ffffff?text=WARL",
-    "Warrior": "https://placehold.co/20x20/C69B6D/ffffff?text=WARR",
-    # Add other classes as needed
-    "Unknown": "https://placehold.co/20x20/808080/ffffff?text=?" # Fallback for unknown classes
+    "Death Knight": {"url": "https://placehold.co/20x20/C41F3B/ffffff?text=DK", "abbr": "DK"},
+    "Demon Hunter": {"url": "https://placehold.co/20x20/A330C9/ffffff?text=DH", "abbr": "DH"},
+    "Druid": {"url": "https://placehold.co/20x20/FF7C0A/ffffff?text=DRU", "abbr": "DRU"},
+    "Evoker": {"url": "https://placehold.co/20x20/33937F/ffffff?text=EVO", "abbr": "EVO"},
+    "Hunter": {"url": "https://placehold.co/20x20/AAD372/ffffff?text=HUN", "abbr": "HUN"},
+    "Mage": {"url": "https://placehold.co/20x20/3FC7EB/ffffff?text=MAG", "abbr": "MAG"},
+    "Monk": {"url": "https://placehold.co/20x20/00FF98/ffffff?text=MON", "abbr": "MON"},
+    "Paladin": {"url": "https://placehold.co/20x20/F48CBA/ffffff?text=PAL", "abbr": "PAL"},
+    "Priest": {"url": "https://placehold.co/20x20/FFFFFF/000000?text=PRI", "abbr": "PRI"},
+    "Rogue": {"url": "https://placehold.co/20x20/FFF468/000000?text=ROG", "abbr": "ROG"},
+    "Shaman": {"url": "https://placehold.co/20x20/0070DD/ffffff?text=SHA", "abbr": "SHA"},
+    "Warlock": {"url": "https://placehold.co/20x20/8788EE/ffffff?text=WARL", "abbr": "WARL"},
+    "Warrior": {"url": "https://placehold.co/20x20/C69B6D/ffffff?text=WARR", "abbr": "WARR"},
+    "Unknown": {"url": "https://placehold.co/20x20/808080/ffffff?text=?", "abbr": "?"} # Fallback
 }
 
 
@@ -374,16 +373,18 @@ def main():
                     # Get class and image URL
                     player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                     player_class = player_data_from_map.get('class', 'Unknown')
-                    class_image_url = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])
+                    
+                    # Get the abbreviation for the class
+                    class_abbr = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
                     
                     # Attempt to get Discord ID for tagging, only for 'current' period
                     discord_id = player_data_from_map.get('discord_id')
 
-                    # Format the player line with image, name, and status
+                    # Format the player line with abbreviation, name, and status
                     if PERIOD_TYPE == 'current' and discord_id is not None:
-                        embed_description += f"![{player_class}]({class_image_url}) <@{discord_id}> - {status}\n"
+                        embed_description += f"{class_abbr} <@{discord_id}> - {status}\n"
                     else:
-                        embed_description += f"![{player_class}]({class_image_url}) {player_name} - {status}\n"
+                        embed_description += f"{class_abbr} {player_name} - {status}\n"
                         
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:

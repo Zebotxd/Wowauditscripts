@@ -18,7 +18,7 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # Path to the Discord ID mapping file
 DISCORD_ID_MAP_FILE = 'discord_id_map.json'
-DISCORD_ID_MAP = {}
+DISCORD_ID_MAP = {} # This will be populated from the file
 
 # Set this to a specific period ID (e.g., 1020) for testing with historical data.
 # Set to None to automatically determine the period based on USE_PREVIOUS_PERIOD_ENV.
@@ -82,6 +82,67 @@ def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Updat
         # In a GitHub Action, you might want to exit with a non-zero code here
         # sys.exit(1)
 
+# --- Function to Update Discord ID Mapping File ---
+def update_discord_id_map_file(api_auth_header, map_file_path):
+    """
+    Fetches character names from WoW Audit API and updates the Discord ID map file.
+    New characters are added with a null Discord ID.
+    """
+    print(f"Attempting to update Discord ID map file: {map_file_path}")
+    characters_api_url = 'https://wowaudit.com/v1/characters'
+    headers = {
+        "accept": "application/json",
+        "Authorization": api_auth_header
+    }
+
+    try:
+        response = requests.get(characters_api_url, headers=headers)
+        response.raise_for_status()
+        api_characters_data = response.json()
+        print(f"Successfully fetched {len(api_characters_data)} characters from WoW Audit API.")
+
+        # Load existing map
+        existing_map = {}
+        if os.path.exists(map_file_path):
+            with open(map_file_path, 'r', encoding='utf-8') as f:
+                try:
+                    existing_map = json.load(f)
+                    print(f"Loaded existing Discord ID map with {len(existing_map)} entries.")
+                except json.JSONDecodeError:
+                    print(f"Warning: '{map_file_path}' is not a valid JSON file. Starting with an empty map.")
+                    existing_map = {}
+        else:
+            print(f"'{map_file_path}' not found. A new map will be created.")
+
+        updated_map = existing_map.copy()
+        new_names_added = 0
+
+        # Iterate through characters from API and add new ones to the map
+        for char_data in api_characters_data:
+            char_name = char_data.get('name')
+            if char_name and char_name not in updated_map:
+                updated_map[char_name] = None # Add new character with null Discord ID
+                new_names_added += 1
+
+        if new_names_added > 0:
+            # Write the updated map back to the file
+            with open(map_file_path, 'w', encoding='utf-8') as f:
+                json.dump(updated_map, f, indent=2, ensure_ascii=False)
+            print(f"Successfully added {new_names_added} new character(s) to '{map_file_path}'.")
+            print("Remember to manually update the Discord IDs for new entries in this file.")
+            return True # Indicate that the map was updated
+        else:
+            print("No new characters found to add to the Discord ID map.")
+            return False # Indicate no update was needed
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error: Failed to fetch characters from WoW Audit API for map update: {e}")
+        if e.response is not None:
+            print(f"Response Content: {e.response.text}")
+        return False
+    except Exception as e:
+        print(f"Error: An unexpected error occurred during map update: {e}")
+        return False
 
 # --- Main Script Logic ---
 def main():
@@ -96,12 +157,28 @@ def main():
         exit(1) # Exit if webhook URL is missing
 
     # Load Discord ID mapping if it's the current period report
+    # And attempt to update the map file if it's the current period check
     if PERIOD_TYPE == 'current':
+        map_updated = update_discord_id_map_file(API_AUTHORIZATION_HEADER, DISCORD_ID_MAP_FILE)
+        
         try:
             with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
                 global DISCORD_ID_MAP
                 DISCORD_ID_MAP = json.load(f)
-            print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE}")
+            # print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE}") # Already printed in update function
+        except FileNotFoundError:
+            print(f"Warning: Discord ID map file '{DISCORD_ID_MAP_FILE}' not found after update attempt. Players will not be tagged.")
+        except json.JSONDecodeError:
+            print(f"Warning: Error decoding JSON from '{DISCORD_ID_MAP_FILE}' after update. Players will not be tagged.")
+        except Exception as e:
+            print(f"Warning: An unexpected error occurred while loading Discord ID map after update: {e}. Players will not be tagged.")
+    else:
+        # For previous period, just try to load the map without updating it
+        try:
+            with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
+                global DISCORD_ID_MAP
+                DISCORD_ID_MAP = json.load(f)
+            print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE} for non-current period.")
         except FileNotFoundError:
             print(f"Warning: Discord ID map file '{DISCORD_ID_MAP_FILE}' not found. Players will not be tagged.")
         except json.JSONDecodeError:
@@ -241,7 +318,7 @@ def main():
                     status = player['DungeonVaultStatus']
                     
                     # Attempt to get Discord ID for tagging, only for 'current' period
-                    if PERIOD_TYPE == 'current' and player_name in DISCORD_ID_MAP:
+                    if PERIOD_TYPE == 'current' and player_name in DISCORD_ID_MAP and DISCORD_ID_MAP[player_name] is not None:
                         discord_id = DISCORD_ID_MAP[player_name]
                         embed_description += f"<@{discord_id}> - {status}\n"
                     else:

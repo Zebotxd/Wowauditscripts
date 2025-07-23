@@ -27,9 +27,9 @@ jobs:
       - name: Run M+ Requirement Script
         run: python check_mplus_requirements.py
         env:
-          # IMPORTANT: Store your Discord Webhook URL as a repository secret
-          # Go to your GitHub repo -> Settings -> Secrets and variables -> Actions -> New repository secret
-          # Name it DISCORD_WEBHOOK_URL and paste your webhook URL there.
-          # Then, in your Python script, you'd retrieve it using os.getenv('DISCORD_WEBHOOK_URL')
-          # For this example, it's directly in the Python script, but secrets are best practice.
-          # DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+           IMPORTANT: Store your Discord Webhook URL as a repository secret
+           Go to your GitHub repo -> Settings -> Secrets and variables -> Actions -> New repository secret
+           Name it DISCORD_WEBHOOK_URL and paste your webhook URL there.
+           Then, in your Python script, you'd retrieve it using os.getenv('DISCORD_WEBHOOK_URL')
+           For this example, it's directly in the Python script, but secrets are best practice.
+           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

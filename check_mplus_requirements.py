@@ -20,10 +20,14 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 # Set to None to automatically determine the period based on USE_PREVIOUS_PERIOD_ENV.
 TEST_PERIOD = None # Change to a specific number (e.g., 1020) for testing, or None for dynamic period
 
-# --- Environment Variable Check for Period Logic ---
+# --- Environment Variable Checks for Period Logic and Message Customization ---
 # If 'true', the script will use (current_period - 1). Otherwise, it uses current_period.
 # This variable is set in the GitHub Actions workflow.
 USE_PREVIOUS_PERIOD_ENV = os.getenv('USE_PREVIOUS_PERIOD', 'false').lower() == 'true'
+
+# Determines the type of period being checked for message customization.
+# Set in GitHub Actions workflow to 'current' or 'previous'.
+PERIOD_TYPE = os.getenv('PERIOD_TYPE', 'current').lower() # Default to 'current'
 
 # --- Function to Send Message to Discord Webhook ---
 def send_discord_webhook(message, webhook_url, embed_title="M+ Requirement Update", embed_color=3447003):
@@ -202,16 +206,25 @@ def main():
 
         # Step 4: Prepare and Send Discord Webhook Message (as an Embed)
         if DISCORD_WEBHOOK_URL: # Check if it's not empty/None
-            embed_description = "Følgende spillere mangler forsat at klare deres m+ requirement inden reset:\n\n"
+            # Customize embed title and initial description based on PERIOD_TYPE
+            if PERIOD_TYPE == 'previous':
+                embed_title = "M+ Requirement"
+                initial_description = "Følgende spillere nåede ikke deres m+ mål i sidste uge:\n\n"
+            else: # Default to 'current'
+                embed_title = "M+ Requirement"
+                initial_description = "Følgende spillere mangler forsat at klare deres m+ requirement inden reset:\n\n"
+
+            embed_description = initial_description
 
             if players_to_report:
                 for player in players_to_report:
                     embed_description += f"{player['PlayerName']} - {player['DungeonVaultStatus']}\n"
-                embed_title = "M+ Requirement: Manglende Spillere"
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:
-                embed_description = "Alle spillere har klaret deres m+ requirement inden reset. Godt arbejde!"
-                embed_title = "M+ Requirement: Alle Klaret!"
+                if PERIOD_TYPE == 'previous':
+                    embed_description = "Alle spillere nåede deres m+ mål i sidste uge. Godt arbejde!"
+                else: # Default to 'current'
+                    embed_description = "Alle spillere har klaret deres m+ requirement inden reset. Godt arbejde!"
                 embed_color = 3066993 # Green color (decimal) for complete
 
             send_discord_webhook(embed_description, DISCORD_WEBHOOK_URL, embed_title, embed_color)

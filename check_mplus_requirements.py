@@ -369,10 +369,10 @@ def main():
             # Customize embed title and initial description based on PERIOD_TYPE
             if PERIOD_TYPE == 'previous':
                 embed_title = "M+ Requirement"
-                initial_description = "Følgende spillere nåede ikke deres m+ mål i sidste uge:\n\n"
+                initial_description = ":warning:Følgende spillere nåede ikke deres m+ mål i sidste uge:\n\n"
             else: # Default to 'current'
                 embed_title = "M+ Requirement"
-                initial_description = "Følgende spillere mangler forsat at klare deres m+ requirement inden reset:\n\n"
+                initial_description = ":warning:Følgende spillere mangler forsat at klare deres m+ requirement inden reset:\n\n"
 
             embed_description = initial_description
 

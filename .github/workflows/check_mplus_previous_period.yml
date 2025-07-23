@@ -26,6 +26,7 @@ jobs:
         run: python check_mplus_requirements.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USE_PREVIOUS_PERIOD: 'true'  # Tell the Python script to use current_period - 1
-          PERIOD_TYPE: 'previous'      # Tell the Python script this is the previous period check
+          # Use the specific webhook for the previous period
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD }}
+          USE_PREVIOUS_PERIOD: 'true'
+          PERIOD_TYPE: 'previous'

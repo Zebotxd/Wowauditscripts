@@ -54,13 +54,13 @@ CLASS_IMAGE_MAP = {
     "Shaman": {"emoji": "<:shaman:1397596573453516981>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
     "Warlock": {"emoji": "<:warlock:1397596595423412314>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warlock.jpg", "abbr": "WARL"},
     "Warrior": {"emoji": "<:warrior:1397596585054961696>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warrior.jpg", "abbr": "WARR"},
-    "Unknown": {"emoji": "", "url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback
+    "Unknown": {"emoji": "<:wussicat:1196785656777670656>", "url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback
 }
 
 # --- Generic Thumbnail URLs for Report Status ---
 THUMBNAIL_STATUS_ICONS = {
-    "incomplete": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_key_02.jpg", # Mythic Keystone icon
-    "complete": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_01.jpg" # Coin/reward icon
+    "incomplete": "https://wow.zamimg.com/images/wow/icons/large/inv_relics_hourglass.jpg", # Mythic Keystone icon
+    "complete": "https://wow.zamimg.com/images/wow/icons/large/inv_relics_hourglass.jpg" # Coin/reward icon
 }
 
 

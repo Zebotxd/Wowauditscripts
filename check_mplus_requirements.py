@@ -41,19 +41,19 @@ PERIOD_TYPE = os.getenv('PERIOD_TYPE', 'current').lower() # Default to 'current'
 #
 # IMPORTANT: Replace the placeholder emoji IDs with your actual Discord custom emoji IDs!
 CLASS_IMAGE_MAP = {
-    "Death Knight": {"emoji": "<:dk:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_deathknight.jpg", "abbr": "DK"},
-    "Demon Hunter": {"emoji": "<:dh:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_demonhunter.jpg", "abbr": "DH"},
-    "Druid": {"emoji": "<:druid:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_druid.jpg", "abbr": "DRU"},
-    "Evoker": {"emoji": "<:evoker:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_evoker.jpg", "abbr": "EVO"},
-    "Hunter": {"emoji": "<:hunter:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_hunter.jpg", "abbr": "HUN"},
-    "Mage": {"emoji": "<:mage:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_mage.jpg", "abbr": "MAG"},
-    "Monk": {"emoji": "<:monk:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_monk.jpg", "abbr": "MON"},
+    "Death Knight": {"emoji": "<:dk:1397596583801131069>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_deathknight.jpg", "abbr": "DK"},
+    "Demon Hunter": {"emoji": "<:dh:1397596581678551082>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_demonhunter.jpg", "abbr": "DH"},
+    "Druid": {"emoji": "<:druid:1397596575210930216>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_druid.jpg", "abbr": "DRU"},
+    "Evoker": {"emoji": "<:evoker:1397597387450749028>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_evoker.jpg", "abbr": "EVO"},
+    "Hunter": {"emoji": "<:hunter:1397596587399843981>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_hunter.jpg", "abbr": "HUN"},
+    "Mage": {"emoji": "<:mage:1397596588922372169>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_mage.jpg", "abbr": "MAG"},
+    "Monk": {"emoji": "<:monk:1397596577232584895>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_monk.jpg", "abbr": "MON"},
     "Paladin": {"emoji": "<:paladin:1397595736782409841>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg", "abbr": "PAL"}, # Updated Paladin emoji ID
-    "Priest": {"emoji": "<:priest:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_priest.jpg", "abbr": "PRI"},
-    "Rogue": {"emoji": "<:rogue:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg", "abbr": "ROG"},
-    "Shaman": {"emoji": "<:shaman:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
-    "Warlock": {"emoji": "<:warlock:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warlock.jpg", "abbr": "WARL"},
-    "Warrior": {"emoji": "<:warrior:123456789012345678>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warrior.jpg", "abbr": "WARR"},
+    "Priest": {"emoji": "<:priest:1397596592931868774>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_priest.jpg", "abbr": "PRI"},
+    "Rogue": {"emoji": "<:rogue:1397596591027912797>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg", "abbr": "ROG"},
+    "Shaman": {"emoji": "<:shaman:1397596573453516981>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
+    "Warlock": {"emoji": "<:warlock:1397596595423412314>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warlock.jpg", "abbr": "WARL"},
+    "Warrior": {"emoji": "<:warrior:1397596585054961696>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_warrior.jpg", "abbr": "WARR"},
     "Unknown": {"emoji": "", "url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback
 }
 

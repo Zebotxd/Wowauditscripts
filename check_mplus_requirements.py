@@ -146,6 +146,8 @@ def update_discord_id_map_file(api_auth_header, map_file_path):
 
 # --- Main Script Logic ---
 def main():
+    global DISCORD_ID_MAP # Moved this declaration to the top of the function
+
     # Check if API_AUTHORIZATION_HEADER is set (from environment variable)
     if not API_AUTHORIZATION_HEADER:
         print("Error: WOWAUDIT_API_KEY environment variable is not set. Please configure it as a GitHub Secret.")
@@ -163,7 +165,7 @@ def main():
         
         try:
             with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
-                global DISCORD_ID_MAP
+                # No 'global' keyword needed here as it's declared at function start
                 DISCORD_ID_MAP = json.load(f)
             # print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE}") # Already printed in update function
         except FileNotFoundError:
@@ -176,7 +178,7 @@ def main():
         # For previous period, just try to load the map without updating it
         try:
             with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
-                global DISCORD_ID_MAP
+                # No 'global' keyword needed here as it's declared at function start
                 DISCORD_ID_MAP = json.load(f)
             print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE} for non-current period.")
         except FileNotFoundError:

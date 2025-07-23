@@ -314,12 +314,17 @@ def main():
 
             embed_description = initial_description
 
+            # --- DEBUGGING DISCORD_ID_MAP CONTENT ---
+            print(f"DEBUG: DISCORD_ID_MAP content before embed creation: {DISCORD_ID_MAP}")
+            # --- END DEBUGGING ---
+
             if players_to_report:
                 for player in players_to_report:
                     player_name = player['PlayerName']
                     status = player['DungeonVaultStatus']
                     
                     # Attempt to get Discord ID for tagging, only for 'current' period
+                    # Ensure DISCORD_ID_MAP[player_name] is not None (i.e., it has a valid ID)
                     if PERIOD_TYPE == 'current' and player_name in DISCORD_ID_MAP and DISCORD_ID_MAP[player_name] is not None:
                         discord_id = DISCORD_ID_MAP[player_name]
                         embed_description += f"<@{discord_id}> - {status}\n"

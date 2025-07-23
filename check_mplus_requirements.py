@@ -16,6 +16,10 @@ REQUIRED_DUNGEON_OPTION_VALUE = 662
 # IMPORTANT: This is now retrieved from a GitHub Secret named DISCORD_WEBHOOK_URL.
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
+# Path to the Discord ID mapping file
+DISCORD_ID_MAP_FILE = 'discord_id_map.json'
+DISCORD_ID_MAP = {}
+
 # Set this to a specific period ID (e.g., 1020) for testing with historical data.
 # Set to None to automatically determine the period based on USE_PREVIOUS_PERIOD_ENV.
 TEST_PERIOD = None # Change to a specific number (e.g., 1020) for testing, or None for dynamic period
@@ -90,6 +94,21 @@ def main():
     if not DISCORD_WEBHOOK_URL:
         print("Error: DISCORD_WEBHOOK_URL environment variable is not set. Please configure it as a GitHub Secret.")
         exit(1) # Exit if webhook URL is missing
+
+    # Load Discord ID mapping if it's the current period report
+    if PERIOD_TYPE == 'current':
+        try:
+            with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
+                global DISCORD_ID_MAP
+                DISCORD_ID_MAP = json.load(f)
+            print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE}")
+        except FileNotFoundError:
+            print(f"Warning: Discord ID map file '{DISCORD_ID_MAP_FILE}' not found. Players will not be tagged.")
+        except json.JSONDecodeError:
+            print(f"Warning: Error decoding JSON from '{DISCORD_ID_MAP_FILE}'. Players will not be tagged.")
+        except Exception as e:
+            print(f"Warning: An unexpected error occurred while loading Discord ID map: {e}. Players will not be tagged.")
+
 
     period_to_use = None
 
@@ -218,7 +237,16 @@ def main():
 
             if players_to_report:
                 for player in players_to_report:
-                    embed_description += f"{player['PlayerName']} - {player['DungeonVaultStatus']}\n"
+                    player_name = player['PlayerName']
+                    status = player['DungeonVaultStatus']
+                    
+                    # Attempt to get Discord ID for tagging, only for 'current' period
+                    if PERIOD_TYPE == 'current' and player_name in DISCORD_ID_MAP:
+                        discord_id = DISCORD_ID_MAP[player_name]
+                        embed_description += f"<@{discord_id}> - {status}\n"
+                    else:
+                        embed_description += f"{player_name} - {status}\n"
+                        
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:
                 if PERIOD_TYPE == 'previous':

@@ -10,7 +10,7 @@ import os # Import the os module to access environment variables
 API_AUTHORIZATION_HEADER = os.getenv('WOWAUDIT_API_KEY')
 
 # Required value for dungeon option_1 and option_2
-REQUIRED_DUNGEON_OPTION_VALUE = 662
+REQUIRED_DUNGEON_OPTION_VALUE = 663
 
 # Discord Webhook URL
 # IMPORTANT: This is now retrieved from a GitHub Secret named DISCORD_WEBHOOK_URL.

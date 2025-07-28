@@ -3,15 +3,13 @@ name: M+ Requirement Check (Current Period)
 on:
   schedule:
     # Runs every Monday at 08:00 UTC (10:00 Danish time)
-    - cron: '0 8 * * 1' # Monday 10:00 Dansk Tid
-    #- cron: '*/5 * * * *'
+    - cron: '0 8 * * 1' # Monday 10:00 Danish Time
   workflow_dispatch:
     # Allows you to manually trigger this specific workflow from the GitHub UI
 
 jobs:
   check_current_period:
     runs-on: ubuntu-latest
-    # Add permissions for the workflow to write to the repository
     permissions:
       contents: write # This grants permission to write files to the repo
     steps:
@@ -27,10 +25,27 @@ jobs:
         run: pip install requests
 
       - name: Run Script for Current Period
+        id: run_script # Add an ID to this step to check its output
         run: python check_mplus_requirements.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
-          #DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_CURRENT_PERIOD }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_CURRENT_PERIOD }}
           USE_PREVIOUS_PERIOD: 'false'
           PERIOD_TYPE: 'current'
+
+      # --- Steps to commit and push the updated discord_id_map.json ---
+      - name: Commit and Push updated Discord ID map
+        # This step will only run if the previous step (running the Python script) was successful
+        # and if there are actual changes to commit.
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add discord_id_map.json
+          
+          # Check if there are any changes to commit
+          git diff --cached --exit-code || \
+          (git commit -m "chore(discord-map): Add new characters from WoW Audit API" && git push)
+        # The '||' operator means: if the left command fails (i.e., git diff --cached --exit-code returns non-zero, meaning there ARE changes),
+        # then execute the right command (git commit && git push).
+        # This prevents the workflow from failing if there are no changes to commit.

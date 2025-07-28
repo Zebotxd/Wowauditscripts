@@ -1,26 +1,98 @@
 {
-  "Zebåt": "173786599140622336",
-  "Dighaha": "256162576356999172",
-  "Jegerligeher": "321639079492190208",
-  "Dezaa": "358266897902600192",
-  "Hefler": "939532167275479111",
-  "Jægerdæmon": "318458806231367700",
-  "Råwa": "141955053975109632",
-  "Hvasåligé": "194054862814576640",
-  "Boommutafuka": "156501761576796160",
-  "Deadlycady": "274542225747214336",
-  "Fynboy": "327398190573682688",
-  "Mighehe": "102504395131863040",
-  "Puslingz": "221309119066275840",
-  "Zhabrina": "193889743547793408",
-  "Toxicmonkeý": "222381684404781056",
-  "Zorradia": "231862976502562816",
-  "Granroyal": "169196574419714048",
-  "Kapowdh": "280449643853381634",
-  "Jolte": "231799581078192128",
-  "Onceadragon": "337310661279350794",
-  "Paranorm": "361190177403699212",
-  "Rissler": "136853689749995520",
-  "Shadowfróst" "249220963177201675",
-  "Zaaz" "98109646899773440"
+  "Jegerligeher": {
+    "discord_id": null,
+    "class": "Mage"
+  },
+  "Rissler": {
+    "discord_id": null,
+    "class": "Hunter"
+  },
+  "Dezaa": {
+    "discord_id": null,
+    "class": "Mage"
+  },
+  "Dighaha": {
+    "discord_id": null,
+    "class": "Death Knight"
+  },
+  "Granroyal": {
+    "discord_id": null,
+    "class": "Priest"
+  },
+  "Hefler": {
+    "discord_id": null,
+    "class": "Paladin"
+  },
+  "Jægerdæmon": {
+    "discord_id": null,
+    "class": "Demon Hunter"
+  },
+  "Råwa": {
+    "discord_id": null,
+    "class": "Monk"
+  },
+  "Zaaz": {
+    "discord_id": null,
+    "class": "Shaman"
+  },
+  "Zebåt": {
+    "discord_id": null,
+    "class": "Paladin"
+  },
+  "Hvasåligé": {
+    "discord_id": null,
+    "class": "Druid"
+  },
+  "Boommutafuka": {
+    "discord_id": null,
+    "class": "Druid"
+  },
+  "Deadlycady": {
+    "discord_id": null,
+    "class": "Demon Hunter"
+  },
+  "Fynboy": {
+    "discord_id": null,
+    "class": "Rogue"
+  },
+  "Mighehe": {
+    "discord_id": null,
+    "class": "Mage"
+  },
+  "Onceadragon": {
+    "discord_id": null,
+    "class": "Warrior"
+  },
+  "Puslingz": {
+    "discord_id": null,
+    "class": "Priest"
+  },
+  "Toxicmonkeý": {
+    "discord_id": null,
+    "class": "Warlock"
+  },
+  "Zhabrina": {
+    "discord_id": null,
+    "class": "Evoker"
+  },
+  "Zorradia": {
+    "discord_id": null,
+    "class": "Warlock"
+  },
+  "Jolte": {
+    "discord_id": null,
+    "class": "Hunter"
+  },
+  "Paranorm": {
+    "discord_id": null,
+    "class": "Druid"
+  },
+  "Shadowfróst": {
+    "discord_id": null,
+    "class": "Death Knight"
+  },
+  "Kapowdh": {
+    "discord_id": null,
+    "class": "Demon Hunter"
+  }
 }

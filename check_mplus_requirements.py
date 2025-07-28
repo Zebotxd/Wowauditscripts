@@ -48,7 +48,7 @@ CLASS_IMAGE_MAP = {
     "Hunter": {"emoji": "<:hunter:1397596587399843981>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_hunter.jpg", "abbr": "HUN"},
     "Mage": {"emoji": "<:mage:1397596588922372169>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_mage.jpg", "abbr": "MAG"},
     "Monk": {"emoji": "<:monk:1397596577232584895>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_monk.jpg", "abbr": "MON"},
-    "Paladin": {"emoji": "<:paladin:1397595736782409841>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg", "abbr": "PAL"}, # Updated Paladin emoji ID
+    "Paladin": {"emoji": "<:paladin:1397595736782409841>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_paladin.jpg", "abbr": "PAL"},
     "Priest": {"emoji": "<:priest:1397596592931868774>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_priest.jpg", "abbr": "PRI"},
     "Rogue": {"emoji": "<:rogue:1397596591027912797>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg", "abbr": "ROG"},
     "Shaman": {"emoji": "<:shaman:1397596573453516981>", "url": "https://wow.zamimg.com/images/wow/icons/large/classicon_shaman.jpg", "abbr": "SHA"},
@@ -59,8 +59,8 @@ CLASS_IMAGE_MAP = {
 
 # --- Generic Thumbnail URLs for Report Status ---
 THUMBNAIL_STATUS_ICONS = {
-    "incomplete": "https://wow.zamimg.com/images/wow/icons/large/inv_relics_hourglass.jpg", # Mythic Keystone icon
-    "complete": "https://wow.zamimg.com/images/wow/icons/large/inv_relics_hourglass.jpg" # Coin/reward icon
+    "incomplete": "https://wow.zamimg.com/images/wow/icons/large/inv_relics_hourglass.jpg", # Hourglass for incomplete
+    "complete": "https://wow.zamimg.com/images/wow/icons/large/inv_relics_hourglass.jpg" # Coin/reward icon for complete
 }
 
 
@@ -389,28 +389,43 @@ def main():
 
 
             if players_to_report:
-                for player in players_to_report:
+                # Separate players by slot requirement
+                players_two_slots = [p for p in players_to_report if p['DungeonVaultStatus'] == "Mangler 2 vault slots"]
+                players_one_slot = [p for p in players_to_report if p['DungeonVaultStatus'] == "Mangler 1 vault slot"]
+
+                # Add players needing 2 slots
+                for player in players_two_slots:
                     player_name = player['PlayerName']
                     status = player['DungeonVaultStatus']
-                    
-                    # Get class info from map
                     player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                     player_class = player_data_from_map.get('class', 'Unknown')
-                    
-                    # Get the custom emoji string for the class
-                    # Fallback to abbreviation if emoji is not defined or empty
                     class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
-                    if not class_display: # If emoji string is empty, use abbreviation
+                    if not class_display:
                         class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
-                    
-                    # Attempt to get Discord ID for tagging, only for 'current' period
                     discord_id = player_data_from_map.get('discord_id')
 
-                    # Format the player line with custom emoji/abbreviation, name, and status
                     if PERIOD_TYPE == 'current' and discord_id is not None:
                         embed_description += f"{class_display} <@{discord_id}> - {status}\n"
                     else:
                         embed_description += f"{class_display} {player_name} - {status}\n"
+                
+                # Add separator and players needing 1 slot
+                if players_one_slot:
+                    embed_description += "\n:yellow_circle: **Mangler kun 1 vault slot:**\n" # Separator with emoji
+                    for player in players_one_slot:
+                        player_name = player['PlayerName']
+                        status = player['DungeonVaultStatus']
+                        player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
+                        player_class = player_data_from_map.get('class', 'Unknown')
+                        class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
+                        if not class_display:
+                            class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
+                        discord_id = player_data_from_map.get('discord_id')
+
+                        if PERIOD_TYPE == 'current' and discord_id is not None:
+                            embed_description += f"{class_display} <@{discord_id}> - {status}\n"
+                        else:
+                            embed_description += f"{class_display} {player_name} - {status}\n"
                         
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:

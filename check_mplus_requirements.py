@@ -394,27 +394,11 @@ def main():
                 players_one_slot = [p for p in players_to_report if p['DungeonVaultStatus'] == "Mangler 1 vault slot"]
 
                 # Add players needing 2 slots
-                for player in players_two_slots:
-                    player_name = player['PlayerName']
-                    status = player['DungeonVaultStatus']
-                    player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
-                    player_class = player_data_from_map.get('class', 'Unknown')
-                    class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
-                    if not class_display:
-                        class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
-                    discord_id = player_data_from_map.get('discord_id')
-
-                    if PERIOD_TYPE == 'current' and discord_id is not None:
-                        embed_description += f"{class_display} <@{discord_id}> - {status}\n"
-                    else:
-                        embed_description += f"{class_display} {player_name} - {status}\n"
-                
-                # Add separator and players needing 1 slot
-                if players_one_slot:
-                    embed_description += "\n:yellow_circle: **Mangler kun 1 vault slot:**\n" # Separator with emoji
-                    for player in players_one_slot:
+                if players_two_slots:
+                    embed_description += ":red_circle: **Mangler 2 vault slots:**\n" # Red circle with bold text
+                    for player in players_two_slots:
                         player_name = player['PlayerName']
-                        status = player['DungeonVaultStatus']
+                        status = player['DungeonVaultStatus'] # This status text is now implied by the heading
                         player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                         player_class = player_data_from_map.get('class', 'Unknown')
                         class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
@@ -423,9 +407,30 @@ def main():
                         discord_id = player_data_from_map.get('discord_id')
 
                         if PERIOD_TYPE == 'current' and discord_id is not None:
-                            embed_description += f"{class_display} <@{discord_id}> - {status}\n"
+                            embed_description += f"{class_display} <@{discord_id}>\n" # Only emoji and tag
                         else:
-                            embed_description += f"{class_display} {player_name} - {status}\n"
+                            embed_description += f"{class_display} {player_name}\n" # Only emoji and name
+                
+                # Add separator and players needing 1 slot
+                if players_one_slot:
+                    # Add a newline for spacing if there were 2-slot players, or if this is the first group
+                    if players_two_slots:
+                        embed_description += "\n"
+                    embed_description += ":yellow_circle: **Mangler kun 1 vault slot:**\n" # Separator with emoji
+                    for player in players_one_slot:
+                        player_name = player['PlayerName']
+                        status = player['DungeonVaultStatus'] # This status text is now implied by the heading
+                        player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
+                        player_class = player_data_from_map.get('class', 'Unknown')
+                        class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
+                        if not class_display:
+                            class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
+                        discord_id = player_data_from_map.get('discord_id')
+
+                        if PERIOD_TYPE == 'current' and discord_id is not None:
+                            embed_description += f"{class_display} <@{discord_id}>\n" # Only emoji and tag
+                        else:
+                            embed_description += f"{class_display} {player_name}\n" # Only emoji and name
                         
                 embed_color = 15548997 # Red color (decimal) for incomplete
             else:

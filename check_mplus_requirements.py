@@ -395,10 +395,9 @@ def main():
 
                 # Add players needing 2 slots
                 if players_two_slots:
-                    embed_description += ":red_circle: **Mangler 2 vault slots:**\n" # Red circle with bold text
+                    embed_description += ":red_circle: **Mangler 2 vault slots:**\n\n" # Red circle with bold text and extra newline
                     for player in players_two_slots:
                         player_name = player['PlayerName']
-                        status = player['DungeonVaultStatus'] # This status text is now implied by the heading
                         player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                         player_class = player_data_from_map.get('class', 'Unknown')
                         class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']
@@ -416,10 +415,9 @@ def main():
                     # Add a newline for spacing if there were 2-slot players, or if this is the first group
                     if players_two_slots:
                         embed_description += "\n"
-                    embed_description += ":yellow_circle: **Mangler kun 1 vault slot:**\n" # Separator with emoji
+                    embed_description += ":yellow_circle: **Mangler kun 1 vault slot:**\n\n" # Separator with emoji and extra newline
                     for player in players_one_slot:
                         player_name = player['PlayerName']
-                        status = player['DungeonVaultStatus'] # This status text is now implied by the heading
                         player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
                         player_class = player_data_from_map.get('class', 'Unknown')
                         class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['emoji']

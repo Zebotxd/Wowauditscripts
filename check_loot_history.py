@@ -162,6 +162,10 @@ def main():
         response.raise_for_status()
         loot_history_data = response.json()
         print(f"Successfully fetched {len(loot_history_data)} loot entries.")
+        
+        # --- DEBUGGING: Print raw loot_history_data ---
+        print(f"DEBUG: Raw loot_history_data (first 5 entries): {json.dumps(loot_history_data[:5], indent=2)}")
+        # --- END DEBUGGING ---
 
         for loot_entry in loot_history_data:
             # Check if loot_entry is a dictionary before trying to use .get()
@@ -221,12 +225,11 @@ def main():
             if not class_display:
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
-            discord_id = player_data_from_map.get('discord_id')
+            # Removed discord_id logic for this script as requested
+            # discord_id = player_data_from_map.get('discord_id')
 
-            if discord_id is not None:
-                embed_description += f"{class_display} <@{discord_id}> - {loot_count} items\n"
-            else:
-                embed_description += f"{class_display} {player_name} - {loot_count} items\n"
+            # Format the player line with class emoji/abbr and loot count
+            embed_description += f"{class_display} {player_name} - {loot_count} items\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot
         if any(p['LootCount'] == 0 for p in player_loot_data):

@@ -218,7 +218,7 @@ def fetch_tier_data_from_sheet(sheet_url, worksheet_name, player_col, tier_col, 
                 player_name = row[player_col - 1].strip()
                 tier_piece_info = row[tier_col - 1].strip()
                 
-                if player_name:
+                if player_name: # Only add if player name is not empty
                     tier_data[player_name] = tier_piece_info
         
         print(f"Successfully fetched tier data for {len(tier_data)} players from Google Sheet.")
@@ -311,8 +311,16 @@ def main():
                 continue
 
             # Safely get nested dictionaries, providing empty dict as default
-            data_content = item.get("data", {})
-            vault_options_content = data_content.get("vault_options", {})
+            # Check if 'data' key exists and is a dictionary
+            data_content = item.get("data")
+            if not isinstance(data_content, dict):
+                data_content = {} # Treat as empty if missing or not a dict
+
+            # Check if 'vault_options' key exists and is a dictionary
+            vault_options_content = data_content.get("vault_options")
+            if not isinstance(vault_options_content, dict):
+                vault_options_content = {} # Treat as empty if missing or not a dict
+
             dungeon_vault_option = vault_options_content.get("dungeons")
 
             name = item.get("name") # Get name after ensuring item is a dict
@@ -454,7 +462,6 @@ def main():
                     current_tier_emoji = TIER_EMOJI_MAP.get(current_tier, current_tier_str)
                     
                     # Get the emoji for max_tier, fallback to string if not found
-                    # Use the same color logic for max_tier as current_tier
                     max_tier_emoji = TIER_EMOJI_MAP.get(max_tier, max_tier_str)
                     
                     formatted_tier_display = f"(Tier: {current_tier_emoji} / {max_tier_emoji})"

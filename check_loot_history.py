@@ -170,13 +170,22 @@ def main():
         loot_history_data = raw_loot_history_response.get('history_items', []) 
         
         print(f"Successfully fetched {len(loot_history_data)} loot entries (from 'history_items' key).")
+
+        # Define excluded response types
+        EXCLUDED_RESPONSE_TYPES = ["tmog", "transmorg"]
         
         for loot_entry in loot_history_data:
             # Check if loot_entry is a dictionary before trying to use .get()
             if isinstance(loot_entry, dict):
-                recipient_id = loot_entry.get('character_id') # Loot history uses 'character_id' for recipient
-                if recipient_id:
-                    loot_counts[recipient_id] = loot_counts.get(recipient_id, 0) + 1
+                response_type_name = loot_entry.get('response_type', {}).get('name')
+                
+                # Only count if response_type_name is not in the excluded list
+                if response_type_name and response_type_name.lower() not in EXCLUDED_RESPONSE_TYPES:
+                    recipient_id = loot_entry.get('character_id') # Loot history uses 'character_id' for recipient
+                    if recipient_id:
+                        loot_counts[recipient_id] = loot_counts.get(recipient_id, 0) + 1
+                else:
+                    print(f"DEBUG: Skipping loot entry due to excluded response type: {response_type_name} for item {loot_entry.get('name')}")
             else:
                 print(f"Warning: Unexpected loot entry format encountered. Expected dict, got {type(loot_entry)}: {loot_entry}")
 
@@ -230,7 +239,7 @@ def main():
             if not class_display:
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
-            # Format the player line with class emoji/abbr and loot count
+            # Format the player line with class emoji/abbr and loot count (no Discord tagging)
             embed_description += f"{class_display} {player_name} - {loot_count} items\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot

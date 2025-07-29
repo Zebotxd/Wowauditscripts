@@ -171,8 +171,8 @@ def main():
         
         print(f"Successfully fetched {len(loot_history_data)} loot entries (from 'history_items' key).")
 
-        # Define excluded response types
-        EXCLUDED_RESPONSE_TYPES = ["tmog", "transmorg"]
+        # Define excluded response types (added "transmog" for robustness)
+        EXCLUDED_RESPONSE_TYPES = ["tmog", "transmorg", "transmog"]
         
         for loot_entry in loot_history_data:
             # Check if loot_entry is a dictionary before trying to use .get()

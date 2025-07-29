@@ -1,10 +1,10 @@
 name: WoW Audit Loot History Report
 
 on:
-  schedule:
+  #schedule:
     # Example: Runs every Monday at 12:00 UTC (14:00 Danish time)
     # Adjust this schedule as needed, e.g., after M+ reset or raids.
-    - cron: '0 12 * * 1' # Monday 14:00 Danish Time
+    #- cron: '0 12 * * 1' # Monday 14:00 Danish Time
   workflow_dispatch:
     # Allows you to manually trigger this specific workflow from the GitHub UI
 

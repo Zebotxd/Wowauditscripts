@@ -43,16 +43,19 @@ CLASS_IMAGE_MAP = {
 }
 
 # --- Tier Piece Emoji Mapping ---
-# IMPORTANT: Replace these with your actual Discord custom emoji IDs!
-TIER_EMOJI_MAP = {
-    0: ":0_red:",
-    1: ":1_red:",
-    2: ":2_yellow:",
-    3: ":3_yellow:",
-    4: ":4_green:",
-    5: ":5_green:",
-    "N/A": ":gray_question:" # Fallback for N/A or unparseable
+# Maps tier count to the color suffix for the emoji.
+# e.g., 0 -> "_red", so the emoji will be constructed as ":0_red:"
+# IMPORTANT: Ensure you have custom emojis named like :0_red:, :1_red:, :2_yellow:, etc., in your Discord server.
+TIER_EMOJI_COLOR_SUFFIX_MAP = {
+    0: "_red",
+    1: "_red",
+    2: "_yellow",
+    3: "_yellow",
+    4: "_green",
+    5: "_green"
 }
+# Fallback emoji for N/A or unparseable tier data
+TIER_EMOJI_FALLBACK = ":gray_question:"
 
 
 # --- Generic Thumbnail URLs for Report Status ---
@@ -345,15 +348,26 @@ def main():
             loot_count = player['LootCount']
             tier_pieces = player['TierPieces'] # Get tier pieces info
             
-            # Determine tier emoji
-            tier_emoji = TIER_EMOJI_MAP.get("N/A") # Default to N/A emoji
+            # Determine tier emoji and format the tier string
+            formatted_tier_display = ""
             if tier_pieces != "N/A" and '/' in tier_pieces:
                 try:
-                    current_tier_str, _ = tier_pieces.split('/')
+                    current_tier_str, max_tier_str = tier_pieces.split('/')
                     current_tier = int(current_tier_str)
-                    tier_emoji = TIER_EMOJI_MAP.get(current_tier, TIER_EMOJI_MAP["N/A"])
+                    max_tier = int(max_tier_str) # Get max tier number
+
+                    # Get the color suffix based on current_tier
+                    color_suffix = TIER_EMOJI_COLOR_SUFFIX_MAP.get(current_tier, "") # Default to empty if no mapping
+                    
+                    # Construct emojis for current_tier and max_tier using the determined color suffix
+                    current_tier_emoji_str = f":{current_tier}{color_suffix}:" if color_suffix else TIER_EMOJI_FALLBACK
+                    max_tier_emoji_str = f":{max_tier}{color_suffix}:" if color_suffix else TIER_EMOJI_FALLBACK
+                    
+                    formatted_tier_display = f"(Tier: {current_tier_emoji_str} / {max_tier_emoji_str})"
                 except ValueError:
-                    pass # Keep default N/A emoji if parsing fails
+                    formatted_tier_display = f"(Tier: {TIER_EMOJI_FALLBACK} {tier_pieces})" # Fallback if parsing fails
+            else:
+                formatted_tier_display = f"(Tier: {TIER_EMOJI_FALLBACK} {tier_pieces})" # Default for N/A or invalid format
             
             # Get class display (emoji or abbr)
             player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
@@ -363,8 +377,8 @@ def main():
             if not class_display:
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
-            # Format the player line with class emoji/abbr, loot count, and tier pieces with emoji
-            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {tier_emoji} {tier_pieces})\n"
+            # Format the player line with class emoji/abbr, loot count, and colored tier pieces
+            embed_description += f"{class_display} {player_name} - {loot_count} items {formatted_tier_display}\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot
         if any(p['LootCount'] == 0 for p in player_loot_data):

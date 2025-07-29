@@ -87,18 +87,18 @@ def main():
         print("Error: DISCORD_WEBHOOK_URL environment variable is not set. Please configure it as a GitHub Secret.")
         exit(1)
 
-    # Load Discord ID mapping (for class info and tagging)
+    # Load Discord ID map (for class info)
     try:
         with open(DISCORD_ID_MAP_FILE, 'r', encoding='utf-8') as f:
             global DISCORD_ID_MAP
             DISCORD_ID_MAP = json.load(f)
         print(f"DEBUG: Successfully loaded Discord ID map from {DISCORD_ID_MAP_FILE}.")
     except FileNotFoundError:
-        print(f"Warning: Discord ID map file '{DISCORD_ID_MAP_FILE}' not found. Player classes and tags may be missing.")
+        print(f"Warning: Discord ID map file '{DISCORD_ID_MAP_FILE}' not found. Player classes may be missing.")
     except json.JSONDecodeError:
-        print(f"Warning: Error decoding JSON from '{DISCORD_ID_MAP_FILE}'. Player classes and tags may be missing.")
+        print(f"Warning: Error decoding JSON from '{DISCORD_ID_MAP_FILE}'. Player classes may be missing.")
     except Exception as e:
-        print(f"Warning: An unexpected error occurred while loading Discord ID map: {e}. Player classes and tags may be missing.")
+        print(f"Warning: An unexpected error occurred while loading Discord ID map: {e}. Player classes may be missing.")
 
     # Step 1: Get the current keystone_season_id
     print("Fetching current period to get keystone_season_id...")
@@ -160,13 +160,18 @@ def main():
     try:
         response = requests.get(loot_history_url, headers=headers)
         response.raise_for_status()
-        loot_history_data = response.json()
-        print(f"Successfully fetched {len(loot_history_data)} loot entries.")
+        raw_loot_history_response = response.json() # Get the full JSON response
         
-        # --- DEBUGGING: Print raw loot_history_data ---
-        print(f"DEBUG: Raw loot_history_data (first 5 entries): {json.dumps(loot_history_data[:5], indent=2)}")
+        # --- DEBUGGING: Print raw loot_history_response ---
+        print(f"DEBUG: Raw loot_history_response (full): {json.dumps(raw_loot_history_response, indent=2)}")
         # --- END DEBUGGING ---
 
+        # Assuming the actual list of loot entries is under a key like 'entries' or 'loot'
+        # If the above debug output shows a different key, update this line.
+        loot_history_data = raw_loot_history_response.get('entries', []) # Access the nested list, default to empty list if key not found
+
+        print(f"Successfully fetched {len(loot_history_data)} loot entries (from 'entries' key).")
+        
         for loot_entry in loot_history_data:
             # Check if loot_entry is a dictionary before trying to use .get()
             if isinstance(loot_entry, dict):
@@ -218,6 +223,7 @@ def main():
             player_name = player['PlayerName']
             loot_count = player['LootCount']
             
+            # Get class display (emoji or abbr)
             player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
             player_class = player_data_from_map.get('class', player['Class']) # Use class from character_map if not in discord_id_map
             
@@ -225,9 +231,6 @@ def main():
             if not class_display:
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
-            # Removed discord_id logic for this script as requested
-            # discord_id = player_data_from_map.get('discord_id')
-
             # Format the player line with class emoji/abbr and loot count
             embed_description += f"{class_display} {player_name} - {loot_count} items\n"
         

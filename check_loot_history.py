@@ -43,19 +43,20 @@ CLASS_IMAGE_MAP = {
 }
 
 # --- Tier Piece Emoji Mapping ---
-# Maps tier count to the color suffix for the emoji.
-# e.g., 0 -> "_red", so the emoji will be constructed as ":0_red:"
-# IMPORTANT: Ensure you have custom emojis named like :0_red:, :1_red:, :2_yellow:, etc., in your Discord server.
-TIER_EMOJI_COLOR_SUFFIX_MAP = {
-    0: "_red",
-    1: "_red",
-    2: "_yellow",
-    3: "_yellow",
-    4: "_green",
-    5: "_green"
+# Maps tier count to the FULL Discord emoji string.
+# IMPORTANT: Ensure you have custom emojis with these exact IDs in your Discord server.
+TIER_EMOJI_MAP = {
+    0: "<:0_red:1399709199247872042>",
+    1: "<:1_red:1399709201407934535>",
+    2: "<:2_yellow:1399708873161703496>",
+    3: "<:3_yellow:1399709204335296612>",
+    4: "<:4_green:1399709206122070126>",
+    # For 5, we need to decide which color to prioritize if both red/yellow/green are options
+    # Based on your previous request, 5 should be green.
+    5: "<:5_green:1399709207837671525>"
 }
 # Fallback emoji for N/A or unparseable tier data
-TIER_EMOJI_FALLBACK = ":gray_question:"
+TIER_EMOJI_FALLBACK = "<:gray_question:1196785656777670656>" # Using a generic question mark emoji ID
 
 
 # --- Generic Thumbnail URLs for Report Status ---
@@ -360,8 +361,13 @@ def main():
                     color_suffix = TIER_EMOJI_COLOR_SUFFIX_MAP.get(current_tier, "") # Default to empty if no mapping
                     
                     # Construct emojis for current_tier and max_tier using the determined color suffix
-                    current_tier_emoji_str = f":{current_tier}{color_suffix}:" if color_suffix else TIER_EMOJI_FALLBACK
-                    max_tier_emoji_str = f":{max_tier}{color_suffix}:" if color_suffix else TIER_EMOJI_FALLBACK
+                    # Check if the emoji exists in TIER_EMOJI_MAP, otherwise fallback to text
+                    current_tier_emoji_str = TIER_EMOJI_MAP.get(current_tier, current_tier_str)
+                    max_tier_emoji_str = TIER_EMOJI_MAP.get(max_tier, max_tier_str) # Use max_tier to get its specific emoji if available, else text
+
+                    # If the max_tier emoji is not found, but the current_tier has a color, apply that color to max_tier too
+                    if not TIER_EMOJI_MAP.get(max_tier) and color_suffix:
+                         max_tier_emoji_str = f":{max_tier}{color_suffix}:"
                     
                     formatted_tier_display = f"(Tier: {current_tier_emoji_str} / {max_tier_emoji_str})"
                 except ValueError:

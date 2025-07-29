@@ -1,0 +1,46 @@
+name: Ugentlig WoW Rapport
+
+on:
+  schedule:
+    # Runs every Sunday at 18:00 UTC (20:00 Danish time)
+    # This will be the single schedule for the combined report
+    - cron: '0 18 * * 0' # Sunday 20:00 Danish Time
+  workflow_dispatch:
+    # Allows you to manually trigger this workflow from the GitHub UI
+
+jobs:
+  generate_combined_report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for updating discord_id_map.json
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests gspread # Install both libraries
+
+      - name: Run Combined Report Script
+        run: python combined_report.py
+        env:
+          WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
+          # Use the webhook secret for the previous period, as it's the primary channel for this combined report
+          DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD: ${{ secrets.DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD }}
+          GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+
+      # --- Steps to commit and push the updated discord_id_map.json (copied from previous M+ workflow) ---
+      - name: Commit and Push updated Discord ID map
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add discord_id_map.json
+          
+          # Check if there are any changes to commit
+          git diff --cached --exit-code || \
+          (git commit -m "chore(discord-map): Add new characters and classes from WoW Audit API" && git push)

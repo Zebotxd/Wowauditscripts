@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs every Sunday at 18:00 UTC (20:00 Danish time)
     # This will be the single schedule for the combined report
-    - cron: '0 17 * * 2,7' # Sunday 20:00 Danish Time
+    - cron: '0 17 * * 0,2' # Sunday 20:00 Danish Time
   workflow_dispatch:
     # Allows you to manually trigger this workflow from the GitHub UI
 

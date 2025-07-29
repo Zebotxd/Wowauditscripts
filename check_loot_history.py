@@ -341,13 +341,13 @@ def main():
 
                     if current_tier < 2:
                         # Red color (diff -)
-                        formatted_tier_pieces = f"```diff\n- {tier_pieces}```" # Only tier_pieces inside
+                        formatted_tier_pieces = f"```diff\n- {tier_pieces}```" # Only tier_pieces inside, still on new line
                     elif 2 <= current_tier <= 3:
                         # Yellow color (fix)
-                        formatted_tier_pieces = f"```fix\n{tier_pieces}```" # Only tier_pieces inside
+                        formatted_tier_pieces = f"```fix\n{tier_pieces}```" # Only tier_pieces inside, still on new line
                     elif current_tier >= 4:
                         # Green color (diff +)
-                        formatted_tier_pieces = f"```diff\n+ {tier_pieces}```" # Only tier_pieces inside
+                        formatted_tier_pieces = f"```diff\n+ {tier_pieces}```" # Only tier_pieces inside, still on new line
                     else:
                         formatted_tier_pieces = f"{tier_pieces}" # Default if logic doesn't cover
                 except ValueError:
@@ -364,7 +364,8 @@ def main():
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
             # Format the player line with class emoji/abbr, loot count, and colored tier pieces
-            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {formatted_tier_pieces})\n"
+            # Removed the code block formatting for tier pieces to keep it inline.
+            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {tier_pieces})\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot
         if any(p['LootCount'] == 0 for p in player_loot_data):

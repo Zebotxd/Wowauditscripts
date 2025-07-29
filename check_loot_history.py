@@ -51,8 +51,6 @@ TIER_EMOJI_MAP = {
     2: "<:2_yellow:1399708873161703496>",
     3: "<:3_yellow:1399709204335296612>",
     4: "<:4_green:1399709206122070126>",
-    # For 5, we need to decide which color to prioritize if both red/yellow/green are options
-    # Based on your previous request, 5 should be green.
     5: "<:5_green:1399709207837671525>"
 }
 # Fallback emoji for N/A or unparseable tier data
@@ -357,19 +355,14 @@ def main():
                     current_tier = int(current_tier_str)
                     max_tier = int(max_tier_str) # Get max tier number
 
-                    # Get the color suffix based on current_tier
-                    color_suffix = TIER_EMOJI_COLOR_SUFFIX_MAP.get(current_tier, "") # Default to empty if no mapping
+                    # Get the emoji for current_tier, fallback to string if not found
+                    current_tier_emoji = TIER_EMOJI_MAP.get(current_tier, current_tier_str)
                     
-                    # Construct emojis for current_tier and max_tier using the determined color suffix
-                    # Check if the emoji exists in TIER_EMOJI_MAP, otherwise fallback to text
-                    current_tier_emoji_str = TIER_EMOJI_MAP.get(current_tier, current_tier_str)
-                    max_tier_emoji_str = TIER_EMOJI_MAP.get(max_tier, max_tier_str) # Use max_tier to get its specific emoji if available, else text
-
-                    # If the max_tier emoji is not found, but the current_tier has a color, apply that color to max_tier too
-                    if not TIER_EMOJI_MAP.get(max_tier) and color_suffix:
-                         max_tier_emoji_str = f":{max_tier}{color_suffix}:"
+                    # Get the emoji for max_tier, fallback to string if not found
+                    # Assuming max_tier will usually be 5, so using TIER_EMOJI_MAP.get(5)
+                    max_tier_emoji = TIER_EMOJI_MAP.get(max_tier, max_tier_str)
                     
-                    formatted_tier_display = f"(Tier: {current_tier_emoji_str} / {max_tier_emoji_str})"
+                    formatted_tier_display = f"(Tier: {current_tier_emoji} / {max_tier_emoji})"
                 except ValueError:
                     formatted_tier_display = f"(Tier: {TIER_EMOJI_FALLBACK} {tier_pieces})" # Fallback if parsing fails
             else:

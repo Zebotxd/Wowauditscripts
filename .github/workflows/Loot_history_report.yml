@@ -29,5 +29,6 @@ jobs:
         run: python check_loot_history.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }} # Test Webhook
           #DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_LOOT_REPORT }} # Use a new webhook secret for loot reports
-           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }} # Test Webhook
+           

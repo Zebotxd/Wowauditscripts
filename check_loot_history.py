@@ -164,9 +164,14 @@ def main():
         print(f"Successfully fetched {len(loot_history_data)} loot entries.")
 
         for loot_entry in loot_history_data:
-            recipient_id = loot_entry.get('recipient_character_id')
-            if recipient_id:
-                loot_counts[recipient_id] = loot_counts.get(recipient_id, 0) + 1
+            # Check if loot_entry is a dictionary before trying to use .get()
+            if isinstance(loot_entry, dict):
+                recipient_id = loot_entry.get('recipient_character_id')
+                if recipient_id:
+                    loot_counts[recipient_id] = loot_counts.get(recipient_id, 0) + 1
+            else:
+                print(f"Warning: Unexpected loot entry format encountered. Expected dict, got {type(loot_entry)}: {loot_entry}")
+
 
     except requests.exceptions.RequestException as e:
         print(f"Error: An error occurred while fetching loot history: {e}")

@@ -166,16 +166,15 @@ def main():
         print(f"DEBUG: Raw loot_history_response (full): {json.dumps(raw_loot_history_response, indent=2)}")
         # --- END DEBUGGING ---
 
-        # Assuming the actual list of loot entries is under a key like 'entries' or 'loot'
-        # If the above debug output shows a different key, update this line.
-        loot_history_data = raw_loot_history_response.get('entries', []) # Access the nested list, default to empty list if key not found
-
-        print(f"Successfully fetched {len(loot_history_data)} loot entries (from 'entries' key).")
+        # CORRECTED: Access the loot entries from the 'history_items' key
+        loot_history_data = raw_loot_history_response.get('history_items', []) 
+        
+        print(f"Successfully fetched {len(loot_history_data)} loot entries (from 'history_items' key).")
         
         for loot_entry in loot_history_data:
             # Check if loot_entry is a dictionary before trying to use .get()
             if isinstance(loot_entry, dict):
-                recipient_id = loot_entry.get('recipient_character_id')
+                recipient_id = loot_entry.get('character_id') # Loot history uses 'character_id' for recipient
                 if recipient_id:
                     loot_counts[recipient_id] = loot_counts.get(recipient_id, 0) + 1
             else:

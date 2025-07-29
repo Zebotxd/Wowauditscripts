@@ -166,7 +166,7 @@ def main():
         print(f"DEBUG: Raw loot_history_response (full): {json.dumps(raw_loot_history_response, indent=2)}")
         # --- END DEBUGGING ---
 
-        # CORRECTED: Access the loot entries from the 'history_items' key
+        # Access the loot entries from the 'history_items' key
         loot_history_data = raw_loot_history_response.get('history_items', []) 
         
         print(f"Successfully fetched {len(loot_history_data)} loot entries (from 'history_items' key).")
@@ -178,14 +178,20 @@ def main():
             # Check if loot_entry is a dictionary before trying to use .get()
             if isinstance(loot_entry, dict):
                 response_type_name = loot_entry.get('response_type', {}).get('name')
+                is_discarded = loot_entry.get('discarded', False) # Default to False if 'discarded' is missing
                 
-                # Only count if response_type_name is not in the excluded list
-                if response_type_name and response_type_name.lower() not in EXCLUDED_RESPONSE_TYPES:
+                # Only count if response_type_name is NOT in the excluded list AND item is NOT discarded
+                if (response_type_name and response_type_name.lower() not in EXCLUDED_RESPONSE_TYPES) and not is_discarded:
                     recipient_id = loot_entry.get('character_id') # Loot history uses 'character_id' for recipient
                     if recipient_id:
                         loot_counts[recipient_id] = loot_counts.get(recipient_id, 0) + 1
                 else:
-                    print(f"DEBUG: Skipping loot entry due to excluded response type: {response_type_name} for item {loot_entry.get('name')}")
+                    reason = []
+                    if response_type_name and response_type_name.lower() in EXCLUDED_RESPONSE_TYPES:
+                        reason.append(f"excluded response type '{response_type_name}'")
+                    if is_discarded:
+                        reason.append("item was discarded")
+                    print(f"DEBUG: Skipping loot entry for item '{loot_entry.get('name')}' (ID: {loot_entry.get('id')}) because: {', '.join(reason)}")
             else:
                 print(f"Warning: Unexpected loot entry format encountered. Expected dict, got {type(loot_entry)}: {loot_entry}")
 

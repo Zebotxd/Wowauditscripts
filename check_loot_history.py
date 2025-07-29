@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 import os
+import gspread # Library for Google Sheets API interaction
 
 # --- Configuration ---
 API_AUTHORIZATION_HEADER = os.getenv('WOWAUDIT_API_KEY')
@@ -9,6 +10,19 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 DISCORD_ID_MAP_FILE = 'discord_id_map.json'
 DISCORD_ID_MAP = {} # This will be populated from the file
+
+# --- Google Sheets Configuration ---
+# Your Google Sheet URL
+GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1s8OfqzI-GEmtmkhaHUzKQuO1HOZga-Z0ARNMqWE7NCw/edit?gid=0"
+GOOGLE_SHEET_WORKSHEET_NAME = "Overview" # The name of the tab/worksheet
+GOOGLE_SHEET_PLAYER_NAME_COLUMN = 1 # Column A (1-indexed)
+GOOGLE_SHEET_TIER_PIECES_COLUMN = 23 # Column W (1-indexed)
+
+# IMPORTANT: Google Sheets Service Account Credentials
+# This should be stored as a GitHub Secret (e.g., GOOGLE_SHEETS_CREDENTIALS)
+# The content of this secret should be the JSON key file for your Google Service Account.
+GOOGLE_SHEETS_CREDENTIALS_JSON = os.getenv('GOOGLE_SHEETS_CREDENTIALS')
+
 
 # --- Class Emoji/Image Mapping (Copied from your existing script) ---
 CLASS_IMAGE_MAP = {
@@ -77,6 +91,65 @@ def send_discord_webhook(message, webhook_url, embed_title="Loot History Report"
             print(f"Discord API Error Message: {e.response.text}")
 
 
+# --- Function to Fetch Tier Data from Google Sheet ---
+def fetch_tier_data_from_sheet(sheet_url, worksheet_name, player_col, tier_col, credentials_json):
+    """
+    Fetches player names and their tier piece counts from a Google Sheet.
+
+    Args:
+        sheet_url (str): The URL of the Google Sheet.
+        worksheet_name (str): The name of the worksheet (tab).
+        player_col (int): The 1-indexed column number for player names.
+        tier_col (int): The 1-indexed column number for tier pieces (e.g., "4/5").
+        credentials_json (str): JSON string of Google Service Account credentials.
+
+    Returns:
+        dict: A dictionary mapping player names to their tier piece strings (e.g., {"PlayerName": "4/5"}).
+              Returns an empty dict if fetching fails.
+    """
+    tier_data = {}
+    try:
+        # Authenticate with Google Sheets using the service account credentials
+        gc = gspread.service_account_from_dict(json.loads(credentials_json))
+        
+        # Open the spreadsheet by URL
+        sh = gc.open_by_url(sheet_url)
+        
+        # Select the worksheet by name
+        worksheet = sh.worksheet(worksheet_name)
+        
+        # Get all values from the player name column and tier pieces column
+        # Using A1 notation to specify the range for better control and efficiency
+        # Assuming data starts from row 1 (header row) and goes down
+        # To get column A and W, we can fetch a range like A:W or A1:W[last_row]
+        # For simplicity, let's fetch all values and process
+        all_values = worksheet.get_all_values()
+        
+        # Skip header row if present (assuming first row is header)
+        data_rows = all_values[1:] 
+        
+        for row in data_rows:
+            if len(row) >= max(player_col, tier_col): # Ensure row has enough columns
+                player_name = row[player_col - 1].strip() # Adjust to 0-indexed
+                tier_piece_info = row[tier_col - 1].strip() # Adjust to 0-indexed
+                
+                if player_name: # Only add if player name is not empty
+                    tier_data[player_name] = tier_piece_info
+        
+        print(f"Successfully fetched tier data for {len(tier_data)} players from Google Sheet.")
+        return tier_data
+
+    except gspread.exceptions.SpreadsheetNotFound:
+        print(f"Error: Google Spreadsheet not found at URL: {sheet_url}")
+    except gspread.exceptions.WorksheetNotFound:
+        print(f"Error: Worksheet '{worksheet_name}' not found in the spreadsheet.")
+    except json.JSONDecodeError:
+        print("Error: GOOGLE_SHEETS_CREDENTIALS environment variable is not valid JSON.")
+    except Exception as e:
+        print(f"Error fetching data from Google Sheet: {e}")
+    return {} # Return empty dict on failure
+
+
 # --- Main Script Logic ---
 def main():
     if not API_AUTHORIZATION_HEADER:
@@ -99,6 +172,23 @@ def main():
         print(f"Warning: Error decoding JSON from '{DISCORD_ID_MAP_FILE}'. Player classes may be missing.")
     except Exception as e:
         print(f"Warning: An unexpected error occurred while loading Discord ID map: {e}. Player classes may be missing.")
+
+    # Fetch tier data from Google Sheet
+    tier_pieces_data = {}
+    if GOOGLE_SHEETS_CREDENTIALS_JSON:
+        tier_pieces_data = fetch_tier_data_from_sheet(
+            GOOGLE_SHEET_URL,
+            GOOGLE_SHEET_WORKSHEET_NAME,
+            GOOGLE_SHEET_PLAYER_NAME_COLUMN,
+            GOOGLE_SHEET_TIER_PIECES_COLUMN,
+            GOOGLE_SHEETS_CREDENTIALS_JSON
+        )
+        # --- DEBUGGING: Print fetched tier data ---
+        print(f"DEBUG: Tier pieces data fetched from Google Sheet: {tier_pieces_data}")
+        # --- END DEBUGGING ---
+    else:
+        print("Warning: GOOGLE_SHEETS_CREDENTIALS environment variable is not set. Skipping Google Sheet data fetch.")
+
 
     # Step 1: Get the current keystone_season_id
     print("Fetching current period to get keystone_season_id...")
@@ -163,7 +253,7 @@ def main():
         raw_loot_history_response = response.json() # Get the full JSON response
         
         # --- DEBUGGING: Print raw loot_history_response ---
-        print(f"DEBUG: Raw loot_history_response (full): {json.dumps(raw_loot_history_response, indent=2)}")
+        # print(f"DEBUG: Raw loot_history_response (full): {json.dumps(raw_loot_history_response, indent=2)}")
         # --- END DEBUGGING ---
 
         # Access the loot entries from the 'history_items' key
@@ -209,10 +299,14 @@ def main():
         player_class = char_info["class"]
         loot_count = loot_counts.get(char_id, 0)
         
+        # Get tier piece info from Google Sheet data
+        tier_pieces_info = tier_pieces_data.get(player_name, "N/A") # Default to "N/A" if not found
+        
         player_loot_data.append({
             "PlayerName": player_name,
             "Class": player_class,
-            "LootCount": loot_count
+            "LootCount": loot_count,
+            "TierPieces": tier_pieces_info # Add tier pieces info
         })
 
     # Sort players by loot count ascending
@@ -221,7 +315,7 @@ def main():
     print("\n--- Loot Report Data ---")
     if player_loot_data:
         for player in player_loot_data:
-            print(f"Player: {player['PlayerName']} (Class: {player['Class']}) - Loot: {player['LootCount']}")
+            print(f"Player: {player['PlayerName']} (Class: {player['Class']}) - Loot: {player['LootCount']} (Tier: {player['TierPieces']})")
     else:
         print("No player loot data found for this season.")
 
@@ -236,6 +330,7 @@ def main():
         for player in player_loot_data:
             player_name = player['PlayerName']
             loot_count = player['LootCount']
+            tier_pieces = player['TierPieces'] # Get tier pieces info
             
             # Get class display (emoji or abbr)
             player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
@@ -245,8 +340,8 @@ def main():
             if not class_display:
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
-            # Format the player line with class emoji/abbr and loot count (no Discord tagging)
-            embed_description += f"{class_display} {player_name} - {loot_count} items\n"
+            # Format the player line with class emoji/abbr, loot count, and tier pieces
+            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {tier_pieces})\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot
         if any(p['LootCount'] == 0 for p in player_loot_data):

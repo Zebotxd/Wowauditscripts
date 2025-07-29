@@ -42,6 +42,19 @@ CLASS_IMAGE_MAP = {
     "Unknown": {"emoji": "<:wussicat:1196785656777670656>", "url": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg", "abbr": "?"} # Fallback
 }
 
+# --- Tier Piece Emoji Mapping ---
+# IMPORTANT: Replace these with your actual Discord custom emoji IDs!
+TIER_EMOJI_MAP = {
+    0: ":0_red:",
+    1: ":1_red:",
+    2: ":2_yellow:",
+    3: ":3_yellow:",
+    4: ":4_green:",
+    5: ":5_green:",
+    "N/A": ":gray_question:" # Fallback for N/A or unparseable
+}
+
+
 # --- Generic Thumbnail URLs for Report Status ---
 THUMBNAIL_STATUS_ICONS = {
     "loot_report": "https://wow.zamimg.com/images/wow/icons/large/inv_misc_bag_07.jpg", # Generic bag/loot icon
@@ -331,29 +344,16 @@ def main():
             player_name = player['PlayerName']
             loot_count = player['LootCount']
             tier_pieces = player['TierPieces'] # Get tier pieces info
-            formatted_tier_pieces = ""
-
+            
+            # Determine tier emoji
+            tier_emoji = TIER_EMOJI_MAP.get("N/A") # Default to N/A emoji
             if tier_pieces != "N/A" and '/' in tier_pieces:
                 try:
-                    current_tier_str, max_tier_str = tier_pieces.split('/')
+                    current_tier_str, _ = tier_pieces.split('/')
                     current_tier = int(current_tier_str)
-                    # max_tier = int(max_tier_str) # Not directly used in logic, but good for completeness
-
-                    if current_tier < 2:
-                        # Red color (diff -)
-                        formatted_tier_pieces = f"```diff\n- {tier_pieces}```" # Only tier_pieces inside, still on new line
-                    elif 2 <= current_tier <= 3:
-                        # Yellow color (fix)
-                        formatted_tier_pieces = f"```fix\n{tier_pieces}```" # Only tier_pieces inside, still on new line
-                    elif current_tier >= 4:
-                        # Green color (diff +)
-                        formatted_tier_pieces = f"```diff\n+ {tier_pieces}```" # Only tier_pieces inside, still on new line
-                    else:
-                        formatted_tier_pieces = f"{tier_pieces}" # Default if logic doesn't cover
+                    tier_emoji = TIER_EMOJI_MAP.get(current_tier, TIER_EMOJI_MAP["N/A"])
                 except ValueError:
-                    formatted_tier_pieces = f"{tier_pieces}" # Fallback if parsing fails
-            else:
-                formatted_tier_pieces = f"{tier_pieces}" # Default for N/A or invalid format
+                    pass # Keep default N/A emoji if parsing fails
             
             # Get class display (emoji or abbr)
             player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
@@ -363,9 +363,8 @@ def main():
             if not class_display:
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
-            # Format the player line with class emoji/abbr, loot count, and colored tier pieces
-            # Removed the code block formatting for tier pieces to keep it inline.
-            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {tier_pieces})\n"
+            # Format the player line with class emoji/abbr, loot count, and tier pieces with emoji
+            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {tier_emoji} {tier_pieces})\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot
         if any(p['LootCount'] == 0 for p in player_loot_data):

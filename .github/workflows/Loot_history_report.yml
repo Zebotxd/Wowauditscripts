@@ -23,12 +23,12 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests gspread # Add gspread here
 
       - name: Run Loot History Report Script
         run: python check_loot_history.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }} # Test Webhook
-          #DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_LOOT_REPORT }} # Use a new webhook secret for loot reports
-           
+          #DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_LOOT_REPORT }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }} #Test
+          GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }} # Pass the new secret

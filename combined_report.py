@@ -294,32 +294,11 @@ def main():
         print(f"Error: {e}")
         exit(1)
 
-    # --- Step 2: Get all characters to map IDs to names and classes ---
-    # This block populates the global character_map
-    print("Fetching all characters for name and class mapping...")
-    characters_api_url = 'https://wowaudit.com/v1/characters'
-    try:
-        response = requests.get(characters_api_url, headers=headers)
-        response.raise_for_status()
-        api_characters_data = response.json()
-        print(f"Successfully fetched {len(api_characters_data)} characters.")
-        # Populate the global character_map
-        for char_data in api_characters_data:
-            char_id = char_data.get('id')
-            char_name = char_data.get('name')
-            char_class = char_data.get('class')
-            if char_id and char_name:
-                character_map[char_id] = {"name": char_name, "class": char_class}
-    except requests.exceptions.RequestException as e:
-        print(f"Error: An error occurred while fetching characters data: {e}")
-        if e.response is not None:
-            print(f"Response Content: {e.response.text}")
-        exit(1)
-
-
     # --- M+ Requirement Check (Previous Period) ---
     mplus_report_period = current_period_from_api - 1
     print(f"\n--- Running M+ Requirement Check for period: {mplus_report_period} ---")
+    mplus_historical_data_url = f"https://wowaudit.com/v1/historical_data?period={mplus_report_period}"
+    
     mplus_players_to_report = []
     try:
         response = requests.get(mplus_historical_data_url, headers=headers)

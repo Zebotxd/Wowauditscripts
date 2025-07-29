@@ -313,13 +313,15 @@ def main():
             # Safely get nested dictionaries, providing empty dict as default
             # Check if 'data' key exists and is a dictionary
             data_content = item.get("data")
+            # Ensure data_content is a dictionary before proceeding
             if not isinstance(data_content, dict):
-                data_content = {} # Treat as empty if missing or not a dict
+                data_content = {} 
 
             # Check if 'vault_options' key exists and is a dictionary
             vault_options_content = data_content.get("vault_options")
+            # Ensure vault_options_content is a dictionary before proceeding
             if not isinstance(vault_options_content, dict):
-                vault_options_content = {} # Treat as empty if missing or not a dict
+                vault_options_content = {} 
 
             dungeon_vault_option = vault_options_content.get("dungeons")
 

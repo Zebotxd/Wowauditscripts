@@ -215,8 +215,8 @@ def fetch_tier_data_from_sheet(sheet_url, worksheet_name, player_col, tier_col, 
         
         for row in data_rows:
             if len(row) >= max(player_col, tier_col):
-                player_name = row[player_col - 1].strip()
-                tier_piece_info = row[tier_col - 1].strip()
+                player_name = row[player_col - 1].strip() # Adjust to 0-indexed
+                tier_piece_info = row[tier_col - 1].strip() # Adjust to 0-indexed
                 
                 if player_name: # Only add if player name is not empty
                     tier_data[player_name] = tier_piece_info
@@ -238,6 +238,8 @@ def fetch_tier_data_from_sheet(sheet_url, worksheet_name, player_col, tier_col, 
 # --- Main Script Logic ---
 def main():
     global DISCORD_ID_MAP
+    global character_map # Declare character_map as global here
+    character_map = {} # Initialize it at the very top of main
 
     if not API_AUTHORIZATION_HEADER:
         print("Error: WOWAUDIT_API_KEY environment variable is not set. Please configure it as a GitHub Secret.")
@@ -291,6 +293,29 @@ def main():
     except ValueError as e:
         print(f"Error: {e}")
         exit(1)
+
+    # --- Step 2: Get all characters to map IDs to names and classes ---
+    # This block populates the global character_map
+    print("Fetching all characters for name and class mapping...")
+    characters_api_url = 'https://wowaudit.com/v1/characters'
+    try:
+        response = requests.get(characters_api_url, headers=headers)
+        response.raise_for_status()
+        api_characters_data = response.json()
+        print(f"Successfully fetched {len(api_characters_data)} characters.")
+        # Populate the global character_map
+        for char_data in api_characters_data:
+            char_id = char_data.get('id')
+            char_name = char_data.get('name')
+            char_class = char_data.get('class')
+            if char_id and char_name:
+                character_map[char_id] = {"name": char_name, "class": char_class}
+    except requests.exceptions.RequestException as e:
+        print(f"Error: An error occurred while fetching characters data: {e}")
+        if e.response is not None:
+            print(f"Response Content: {e.response.text}")
+        exit(1)
+
 
     # --- M+ Requirement Check (Previous Period) ---
     mplus_report_period = current_period_from_api - 1
@@ -425,6 +450,7 @@ def main():
                 print(f"Warning: Unexpected loot entry format encountered. Expected dict, got {type(loot_entry)}: {loot_entry}")
 
         # Combine character_map with loot_counts and tier_pieces_data
+        # character_map is now a global variable
         for char_id, char_info in character_map.items():
             player_name = char_info["name"]
             player_class = char_info["class"]

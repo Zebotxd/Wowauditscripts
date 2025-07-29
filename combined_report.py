@@ -385,7 +385,7 @@ def main():
         players_one_slot = [p for p in mplus_players_to_report if p['DungeonVaultStatus'] == "Mangler 1 vault slot"]
 
         if players_two_slots:
-            mplus_embed_description_part += ":red_circle: **Mangler 2 vault slots:**\n\n"
+            mplus_embed_description_part += ":red_circle: **Manglede 2 vault slots:**\n\n"
             for player in players_two_slots:
                 player_name = player['PlayerName']
                 player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
@@ -399,7 +399,7 @@ def main():
         if players_one_slot:
             if players_two_slots:
                 mplus_embed_description_part += "\n"
-            mplus_embed_description_part += ":yellow_circle: **Mangler kun 1 vault slot:**\n\n"
+            mplus_embed_description_part += ":yellow_circle: **Manglede 1 vault slot:**\n\n"
             for player in players_one_slot:
                 player_name = player['PlayerName']
                 player_data_from_map = DISCORD_ID_MAP.get(player_name, {})

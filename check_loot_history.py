@@ -341,19 +341,19 @@ def main():
 
                     if current_tier < 2:
                         # Red color (diff -)
-                        formatted_tier_pieces = f"```diff\n- Tier: {tier_pieces}```"
+                        formatted_tier_pieces = f"```diff\n- {tier_pieces}```" # Only tier_pieces inside
                     elif 2 <= current_tier <= 3:
                         # Yellow color (fix)
-                        formatted_tier_pieces = f"```fix\nTier: {tier_pieces}```"
+                        formatted_tier_pieces = f"```fix\n{tier_pieces}```" # Only tier_pieces inside
                     elif current_tier >= 4:
                         # Green color (diff +)
-                        formatted_tier_pieces = f"```diff\n+ Tier: {tier_pieces}```"
+                        formatted_tier_pieces = f"```diff\n+ {tier_pieces}```" # Only tier_pieces inside
                     else:
-                        formatted_tier_pieces = f"(Tier: {tier_pieces})" # Default if logic doesn't cover
+                        formatted_tier_pieces = f"{tier_pieces}" # Default if logic doesn't cover
                 except ValueError:
-                    formatted_tier_pieces = f"(Tier: {tier_pieces})" # Fallback if parsing fails
+                    formatted_tier_pieces = f"{tier_pieces}" # Fallback if parsing fails
             else:
-                formatted_tier_pieces = f"(Tier: {tier_pieces})" # Default for N/A or invalid format
+                formatted_tier_pieces = f"{tier_pieces}" # Default for N/A or invalid format
             
             # Get class display (emoji or abbr)
             player_data_from_map = DISCORD_ID_MAP.get(player_name, {})
@@ -364,7 +364,7 @@ def main():
                 class_display = CLASS_IMAGE_MAP.get(player_class, CLASS_IMAGE_MAP['Unknown'])['abbr']
             
             # Format the player line with class emoji/abbr, loot count, and colored tier pieces
-            embed_description += f"{class_display} {player_name} - {loot_count} items {formatted_tier_pieces}\n"
+            embed_description += f"{class_display} {player_name} - {loot_count} items (Tier: {formatted_tier_pieces})\n"
         
         # Set embed color based on some criteria if desired, e.g., if someone has 0 loot
         if any(p['LootCount'] == 0 for p in player_loot_data):

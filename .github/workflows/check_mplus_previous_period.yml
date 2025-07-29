@@ -1,9 +1,9 @@
 name: M+ Requirement Check (Previous Period)
 
 on:
-  schedule:
+  #schedule:
     # Example: Runs every Sunday at 18:00 UTC (20:00 Danish time)
-    - cron: '0 18 * * 0' # Sunday 20:00 Danish Time
+    #- cron: '0 18 * * 0' # Sunday 20:00 Danish Time
   workflow_dispatch:
     # Allows you to manually trigger this specific workflow from the GitHub UI
 

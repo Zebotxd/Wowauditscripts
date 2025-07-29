@@ -320,8 +320,6 @@ def main():
     # --- M+ Requirement Check (Previous Period) ---
     mplus_report_period = current_period_from_api - 1
     print(f"\n--- Running M+ Requirement Check for period: {mplus_report_period} ---")
-    mplus_historical_data_url = f"https://wowaudit.com/v1/historical_data?period={mplus_report_period}"
-    
     mplus_players_to_report = []
     try:
         response = requests.get(mplus_historical_data_url, headers=headers)
@@ -470,7 +468,7 @@ def main():
         print(f"Error: Loot report - An error occurred fetching loot history: {e}")
         player_loot_data = [] # Ensure it's empty on error
 
-    loot_embed_description_part = "\n\n---\n\n**Lootfordeling for denne sæson (sorteret efter færrest items):**\n\n"
+    loot_embed_description_part = "\n\n**Lootfordeling for denne sæson (sorteret efter færrest items):**\n\n" # Removed "---"
     loot_embed_color = 3447003 # Default Discord blue
 
     if player_loot_data:

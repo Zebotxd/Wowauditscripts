@@ -305,8 +305,17 @@ def main():
         mplus_data_items = mplus_raw_data.get('characters', [])
 
         for item in mplus_data_items:
-            name = item.get("name")
-            dungeon_vault_option = item.get("data", {}).get("vault_options", {}).get("dungeons")
+            # Safely check if item is a dictionary before proceeding
+            if not isinstance(item, dict):
+                print(f"Warning: M+ data item is not a dictionary. Skipping: {item}")
+                continue
+
+            # Safely get nested dictionaries, providing empty dict as default
+            data_content = item.get("data", {})
+            vault_options_content = data_content.get("vault_options", {})
+            dungeon_vault_option = vault_options_content.get("dungeons")
+
+            name = item.get("name") # Get name after ensuring item is a dict
 
             report_player = True
             status_details = None
@@ -441,7 +450,11 @@ def main():
                     current_tier = int(current_tier_str)
                     max_tier = int(max_tier_str)
 
+                    # Get the emoji for current_tier, fallback to string if not found
                     current_tier_emoji = TIER_EMOJI_MAP.get(current_tier, current_tier_str)
+                    
+                    # Get the emoji for max_tier, fallback to string if not found
+                    # Use the same color logic for max_tier as current_tier
                     max_tier_emoji = TIER_EMOJI_MAP.get(max_tier, max_tier_str)
                     
                     formatted_tier_display = f"(Tier: {current_tier_emoji} / {max_tier_emoji})"

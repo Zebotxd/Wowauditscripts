@@ -98,5 +98,21 @@
   "Kokainbjørn": {
     "discord_id": null,
     "class": "Druid"
+  },
+  "Fissethomas": {
+    "discord_id": null,
+    "class": "Mage"
+  },
+  "Gelle": {
+    "discord_id": null,
+    "class": "Demon Hunter"
+  },
+  "Shamnjoy": {
+    "discord_id": null,
+    "class": "Shaman"
+  },
+  "Deathkrimi": {
+    "discord_id": null,
+    "class": "Death Knight"
   }
 }

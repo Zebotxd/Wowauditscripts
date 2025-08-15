@@ -30,7 +30,8 @@ jobs:
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
           # Use the webhook secret for the previous period, as it's the primary channel for this combined report
-          DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD: ${{ secrets.DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD }}
+          #DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD: ${{ secrets.DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD }}
+          DISCORD_WEBHOOK_URL_PREVIOUS_PERIOD: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
 
       # --- Steps to commit and push the updated discord_id_map.json (copied from previous M+ workflow) ---

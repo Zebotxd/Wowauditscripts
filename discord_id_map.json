@@ -114,5 +114,9 @@
   "Deathkrimi": {
     "discord_id": null,
     "class": "Death Knight"
+  },
+  "Rejeost": {
+    "discord_id": null,
+    "class": "Shaman"
   }
 }

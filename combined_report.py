@@ -19,7 +19,7 @@ GOOGLE_SHEET_TIER_PIECES_COLUMN = 23 # Column W (1-indexed)
 GOOGLE_SHEETS_CREDENTIALS_JSON = os.getenv('GOOGLE_SHEETS_CREDENTIALS')
 
 # --- M+ Requirement Configuration ---
-REQUIRED_DUNGEON_OPTION_VALUE = 662
+REQUIRED_DUNGEON_OPTION_VALUE = 707
 
 # --- Loot History Exclusion Configuration ---
 EXCLUDED_LOOT_RESPONSE_TYPES = ["tmog", "transmorg", "transmog"]

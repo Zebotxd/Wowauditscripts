@@ -29,8 +29,8 @@ jobs:
         run: python check_mplus_requirements.py
         env:
           WOWAUDIT_API_KEY: ${{ secrets.WOWAUDIT_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          #DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_CURRENT_PERIOD }}
+          #DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_CURRENT_PERIOD }}
           USE_PREVIOUS_PERIOD: 'false'
           PERIOD_TYPE: 'current'
 

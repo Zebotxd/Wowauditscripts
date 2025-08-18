@@ -106,13 +106,5 @@
   "Rejeost": {
     "discord_id": 281179501801766924,
     "class": "Shaman"
-  },
-  "Jönza": {
-    "discord_id": null,
-    "class": "Death Knight"
-  },
-  "Zoradi": {
-    "discord_id": null,
-    "class": "Priest"
   }
 }

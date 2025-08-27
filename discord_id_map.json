@@ -106,5 +106,9 @@
   "Rejeost": {
     "discord_id": 281179501801766924,
     "class": "Shaman"
+  },
+  "Feldoni": {
+    "discord_id": null,
+    "class": "Shaman"
   }
 }

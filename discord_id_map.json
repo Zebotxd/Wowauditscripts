@@ -110,5 +110,9 @@
   "Feldoni": {
     "discord_id": null,
     "class": "Shaman"
+  },
+  "Kokaintyr": {
+    "discord_id": null,
+    "class": "Druid"
   }
 }

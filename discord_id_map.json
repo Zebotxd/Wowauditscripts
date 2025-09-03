@@ -114,5 +114,13 @@
   "Kokaintyr": {
     "discord_id": null,
     "class": "Druid"
+  },
+  "Ravnpriest": {
+    "discord_id": null,
+    "class": "Priest"
+  },
+  "Sovannah": {
+    "discord_id": null,
+    "class": "Monk"
   }
 }

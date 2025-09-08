@@ -122,5 +122,9 @@
   "Sovannah": {
     "discord_id": null,
     "class": "Monk"
+  },
+  "Kæft": {
+    "discord_id": null,
+    "class": "Warrior"
   }
 }

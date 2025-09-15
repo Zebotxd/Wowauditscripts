@@ -107,24 +107,20 @@
     "discord_id": 281179501801766924,
     "class": "Shaman"
   },
-  "Feldoni": {
-    "discord_id": null,
-    "class": "Shaman"
-  },
   "Kokaintyr": {
-    "discord_id": null,
+    "discord_id": 194054862814576640,
     "class": "Druid"
   },
   "Ravnpriest": {
-    "discord_id": null,
+    "discord_id": 1156199314935267348,
     "class": "Priest"
   },
   "Sovannah": {
-    "discord_id": null,
+    "discord_id": 178135525536825345,
     "class": "Monk"
   },
   "Kæft": {
-    "discord_id": null,
+    "discord_id": 98375787501080576,
     "class": "Warrior"
   }
 }

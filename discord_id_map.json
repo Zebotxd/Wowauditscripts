@@ -122,5 +122,13 @@
   "Kæft": {
     "discord_id": 98375787501080576,
     "class": "Warrior"
+  },
+  "Pozezdw": {
+    "discord_id": null,
+    "class": "Warrior"
+  },
+  "Zjuman": {
+    "discord_id": null,
+    "class": "Shaman"
   }
 }

@@ -130,5 +130,13 @@
   "Zjuman": {
     "discord_id": null,
     "class": "Shaman"
+  },
+  "Pozezddk": {
+    "discord_id": null,
+    "class": "Death Knight"
+  },
+  "Blodhund": {
+    "discord_id": null,
+    "class": "Druid"
   }
 }

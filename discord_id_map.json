@@ -138,5 +138,13 @@
   "Blodhund": {
     "discord_id": null,
     "class": "Druid"
+  },
+  "Phorbidden": {
+    "discord_id": null,
+    "class": "Priest"
+  },
+  "Lilleguf": {
+    "discord_id": null,
+    "class": "Paladin"
   }
 }

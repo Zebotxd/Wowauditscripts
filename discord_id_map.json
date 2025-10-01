@@ -150,5 +150,9 @@
   "Samsoonus": {
     "discord_id": null,
     "class": "Paladin"
+  },
+  "Bréezh": {
+    "discord_id": null,
+    "class": "Druid"
   }
 }

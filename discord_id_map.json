@@ -158,5 +158,9 @@
   "Røgalarm": {
     "discord_id": null,
     "class": "Hunter"
+  },
+  "Ch": {
+    "discord_id": null,
+    "class": "Shaman"
   }
 }

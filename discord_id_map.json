@@ -162,5 +162,9 @@
   "Ch": {
     "discord_id": null,
     "class": "Shaman"
+  },
+  "Almægtigeræv": {
+    "discord_id": null,
+    "class": "Warrior"
   }
 }

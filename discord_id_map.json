@@ -166,5 +166,21 @@
   "Almægtigeræv": {
     "discord_id": null,
     "class": "Warrior"
+  },
+  "Zhimira": {
+    "discord_id": null,
+    "class": "Druid"
+  },
+  "Orjin": {
+    "discord_id": null,
+    "class": "Monk"
+  },
+  "Freý": {
+    "discord_id": null,
+    "class": "Rogue"
+  },
+  "Zuggie": {
+    "discord_id": null,
+    "class": "Monk"
   }
 }

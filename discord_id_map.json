@@ -186,5 +186,9 @@
   "Ziqzagoon": {
     "discord_id": null,
     "class": "Monk"
+  },
+  "Tobimonk": {
+    "discord_id": null,
+    "class": "Monk"
   }
 }

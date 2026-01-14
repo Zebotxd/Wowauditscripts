@@ -190,5 +190,13 @@
   "Tobimonk": {
     "discord_id": null,
     "class": "Monk"
+  },
+  "Dezi": {
+    "discord_id": null,
+    "class": "Demon Hunter"
+  },
+  "Sjomi": {
+    "discord_id": null,
+    "class": "Warlock"
   }
 }

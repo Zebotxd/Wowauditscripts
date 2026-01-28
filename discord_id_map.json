@@ -198,5 +198,9 @@
   "Sjomi": {
     "discord_id": null,
     "class": "Warlock"
+  },
+  "Borros": {
+    "discord_id": null,
+    "class": "Death Knight"
   }
 }

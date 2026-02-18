@@ -206,5 +206,13 @@
   "Òwlulu": {
     "discord_id": null,
     "class": "Paladin"
+  },
+  "Magichoej": {
+    "discord_id": null,
+    "class": "Mage"
+  },
+  "Dropsteps": {
+    "discord_id": null,
+    "class": "Hunter"
   }
 }

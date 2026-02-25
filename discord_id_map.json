@@ -214,5 +214,9 @@
   "Dropsteps": {
     "discord_id": null,
     "class": "Hunter"
+  },
+  "Wickii": {
+    "discord_id": null,
+    "class": "Shaman"
   }
 }

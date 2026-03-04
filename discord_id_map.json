@@ -218,5 +218,21 @@
   "Wickii": {
     "discord_id": null,
     "class": "Shaman"
+  },
+  "Dødjæger": {
+    "discord_id": null,
+    "class": "Death Knight"
+  },
+  "Ferskentærte": {
+    "discord_id": null,
+    "class": "Demon Hunter"
+  },
+  "Arzir": {
+    "discord_id": null,
+    "class": "Priest"
+  },
+  "Zoradie": {
+    "discord_id": null,
+    "class": "Evoker"
   }
 }

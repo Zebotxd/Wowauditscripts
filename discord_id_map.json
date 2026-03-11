@@ -234,5 +234,9 @@
   "Zoradie": {
     "discord_id": null,
     "class": "Evoker"
+  },
+  "Planteater": {
+    "discord_id": null,
+    "class": "Druid"
   }
 }

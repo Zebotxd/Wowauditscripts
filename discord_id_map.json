@@ -238,5 +238,13 @@
   "Planteater": {
     "discord_id": null,
     "class": "Druid"
+  },
+  "Seniledaddy": {
+    "discord_id": null,
+    "class": "Druid"
+  },
+  "Evoggie": {
+    "discord_id": null,
+    "class": "Evoker"
   }
 }
